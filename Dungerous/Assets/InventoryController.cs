@@ -5,21 +5,25 @@ using UnityEngine;
 public class InventoryController : MonoBehaviour
 {
     //Variables
+    public float inventoryRollSpeed;
+
     public float pickupRadius;
     public LayerMask whatIsPickupable;
     public Transform inventoryPoint;
     public List<GameObject> items;
 
     public Vector3 camOffset;
+    private Vector3 ballRightDir;
 
     //References
     public Camera inventoryCam;
-
+    private PlayerController player;
 
     // Start is called before the first frame update
     void Start()
     {
         inventoryCam.transform.parent = null;
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
@@ -36,6 +40,30 @@ public class InventoryController : MonoBehaviour
         }
 
         inventoryCam.transform.position = transform.position + camOffset;
+
+        if (player.checkingInventory)
+        {
+            RollInventory();
+        }
+    }
+
+    private void RollInventory()
+    {
+        Vector3 ballDir = inventoryCam.transform.TransformDirection(new Vector3(-player.moveRInput.x, -player.moveRInput.y, 0)); ;
+        ballRightDir = Vector3.Cross(Vector3.forward, ballDir);
+        float dist = ballDir.magnitude * Time.deltaTime;
+        float alpha = (dist * 180.0f) / (Mathf.PI * 0.37f);
+        inventoryPoint.transform.Rotate(ballRightDir, alpha * inventoryRollSpeed, Space.World);
+    }
+
+    public void OpenInventory()
+    {
+        inventoryCam.depth = 1;
+    }
+
+    public void CloseInventory()
+    {
+        inventoryCam.depth = -1;
     }
 
     private void OnDrawGizmosSelected()

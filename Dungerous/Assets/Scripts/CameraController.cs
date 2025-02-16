@@ -20,7 +20,8 @@ public class CameraController : MonoBehaviour
     //References
     private PlayerController player;
     private GameObject ball;
-    private Camera cam;
+    [HideInInspector]
+    public Camera cam;
 
     // Start is called before the first frame update
     void Start()

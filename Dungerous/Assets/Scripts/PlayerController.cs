@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
 
     public float moveModelLeanAmount;
 
+    public bool checkingInventory;
+
     //References
     private CharacterController charCtrl;
     private PlayerControls controls;
@@ -46,6 +48,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController ballCtrl;
     private BallController ballLogic;
     public Transform groundCheck;
+    private InventoryController inventoryCtrl;
 
     private void Awake()
     {
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour
         charCtrl = GetComponent<CharacterController>();
         ballCtrl = ballTrans.gameObject.GetComponent<CharacterController>();
         ballLogic = ballTrans.gameObject.GetComponent<BallController>();
+        inventoryCtrl = ballTrans.gameObject.GetComponent<InventoryController>();
         anim = GetComponent<Animator>();
     }
 
@@ -92,6 +96,8 @@ public class PlayerController : MonoBehaviour
 
         if (!isRolling)
         {
+            checkingInventory = false;
+            inventoryCtrl.CloseInventory();
             ballLogic.freeRoll = true;
             if(isGrounded)
             {
@@ -112,6 +118,22 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            if(isGrounded)
+            {
+                if (controls.Gameplay.Inventory.WasPressedThisFrame())
+                {
+                    if (checkingInventory == false)
+                    {
+                        checkingInventory = true;
+                        inventoryCtrl.OpenInventory();
+                    }
+                    else
+                    {
+                        checkingInventory = false;
+                        inventoryCtrl.CloseInventory();
+                    }
+                }
+            }
             ballLogic.freeRoll = false;
         }
         Animate();
@@ -119,7 +141,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(isRolling)
+        if(isRolling && checkingInventory == false)
         {
             MoveBall();
         }
