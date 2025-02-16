@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour
     private Vector3 startEuler;
 
     public Vector3 ballFocusOffset, playerFocusOffset;
-    public float maxZoom, minZoom, zoomSpeed;
+    public float maxZoom, minZoom, zoomSpeed, startZoom;
 
     //References
     private PlayerController player;
@@ -31,19 +31,21 @@ public class CameraController : MonoBehaviour
         player.cam = this;
         cam = GetComponent<Camera>();
         ball = player.ballTrans.gameObject;
+        startZoom = cam.fieldOfView;
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        CamFocus();
         CamMove();
+        CamFocus();
     }
 
     void CamFocus()
     {
         if(player.isRolling)
         {
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, startZoom, zoomSpeed * Time.deltaTime);
             target = ball.transform;
             pivot.transform.parent = player.transform;
             pivot.transform.position = target.position;

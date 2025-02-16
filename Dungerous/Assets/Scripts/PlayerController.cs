@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 moveDirection, moveDirectionR;
     private bool isMoving;
+    private bool isMovingBall;
 
     public float moveModelLeanAmount;
 
@@ -42,8 +43,7 @@ public class PlayerController : MonoBehaviour
     public CameraController cam;
 
     public Transform ballTrans;
-    private Rigidbody ballRb;
-
+    private CharacterController ballCtrl;
     public Transform groundCheck;
 
     private void Awake()
@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         charCtrl = GetComponent<CharacterController>();
-        ballRb = ballTrans.gameObject.GetComponent<Rigidbody>();
+        ballCtrl = ballTrans.gameObject.GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
     }
 
@@ -94,6 +94,7 @@ public class PlayerController : MonoBehaviour
             {
                 if(controls.Gameplay.Jump.WasPressedThisFrame())
                 {
+                    anim.SetTrigger("Jump");
                     jumpTime = maxJumpTime;
                 }
             }
@@ -103,15 +104,18 @@ public class PlayerController : MonoBehaviour
                 Jump();
                 jumpTime -= Time.deltaTime;
             }
-
+            isMovingBall = false;
             MoveIndependent();
         }
-        else
+        Animate();
+    }
+
+    private void FixedUpdate()
+    {
+        if(isRolling)
         {
             MoveBall();
         }
-
-        Animate();
     }
 
     void MoveIndependent()
@@ -141,31 +145,38 @@ public class PlayerController : MonoBehaviour
         moveDirection = new Vector3(moveLInput.x, 0, moveLInput.y);
         moveDirectionR = transform.TransformDirection(new Vector3(moveRInput.x, 0, moveRInput.y));
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(ballTrans.position.x - transform.position.x, 0, ballTrans.position.z - transform.position.z)), rotateSpeed * Time.deltaTime);
-        
+        model.transform.localEulerAngles = Vector3.zero;
         if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > ballRollDistance)
         {
-            charCtrl.Move(transform.forward * rollMoveSpeed * Time.deltaTime);
+            charCtrl.Move((ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
         }
         else if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) < ballRollDistance * 0.9f)
         {
-            charCtrl.Move(-transform.forward * rollMoveSpeed * Time.deltaTime);
+            charCtrl.Move(-(ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
         }
-
         if(moveRInput != Vector2.zero)
         {
+            isMovingBall = true;
             charCtrl.Move(new Vector3(moveDirectionR.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirectionR.normalized.z * rollMoveSpeed) * Time.deltaTime);
-            ballRb.velocity = new Vector3(charCtrl.velocity.x, ballRb.velocity.y, charCtrl.velocity.z);
+            ballCtrl.Move(charCtrl.velocity * Time.deltaTime);
         }
         else
         {
+            isMovingBall = false;
             charCtrl.Move(new Vector3(transform.right.x * moveDirection.x * rollMoveSpeed, Physics.gravity.y, transform.right.z * moveDirection.x * rollMoveSpeed) * Time.deltaTime);
-            ballRb.velocity = new Vector3(0, ballRb.velocity.y, 0);
         }
+        
+
     }
 
     void Animate()
     {
         anim.SetBool("IsMoving", isMoving);
+        anim.SetBool("IsGrounded", isGrounded);
+        anim.SetFloat("RMoveXInput", moveRInput.x);
+        anim.SetFloat("RMoveYInput", moveRInput.y);
+        anim.SetBool("IsRolling", isRolling);
+        anim.SetBool("IsMovingBall", isMovingBall);
     }
 
     private void OnDrawGizmosSelected()

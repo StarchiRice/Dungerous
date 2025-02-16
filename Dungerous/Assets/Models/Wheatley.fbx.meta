@@ -22,27 +22,9 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
-    rigImportWarnings: "Avatar Rig Configuration mis-match. Inbetween bone rotation
-      in configuration does not match rotation in animation file:\n\t'Quad.L' : rotation
-      error = 7.247408 deg\n\t'Heel.R' : rotation error = 16.053059 deg\n"
+    rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'Run' has import animation warnings that might
-      lower retargeting quality:\nNote: Activate translation DOF on avatar to improve
-      retargeting quality.\n\t'BicepUpper.L' is inbetween humanoid transforms and
-      has rotation animation that will be discarded.\n\t'BicepUpper.R' is inbetween
-      humanoid transforms and has rotation animation that will be discarded.\n\t'Quad.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Heel.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Quad.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Heel.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'Armature|Run' has import animation warnings that might lower retargeting quality:\nNote:
-      Activate translation DOF on avatar to improve retargeting quality.\n\t'BicepUpper.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'BicepUpper.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Quad.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Heel.L'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Quad.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Heel.R'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
+    animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -114,11 +96,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Idle.Independent
-      takeName: Armature|Idle.Independent
+      name: Jump
+      takeName: Jump
       internalID: -6668995235477030013
       firstFrame: 0
-      lastFrame: 39
+      lastFrame: 10
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -143,18 +125,18 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Jump
-      takeName: Armature|Jump
+      name: Idle.Pushball
+      takeName: Idle.Pushball
       internalID: 1079665108409675491
       firstFrame: 0
-      lastFrame: 1
+      lastFrame: 29
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -172,18 +154,105 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|Run
-      takeName: Armature|Run
+      name: MoveForward.Pushball
+      takeName: MoveForward.Pushball
       internalID: -7551964380084998518
       firstFrame: 0
-      lastFrame: 19
+      lastFrame: 28
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: MoveBack.Pushball
+      takeName: Armature|MoveBack.Pushball
+      internalID: 3329042153580447567
+      firstFrame: 0
+      lastFrame: 28
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: MoveLeft.Pushball
+      takeName: Armature|MoveLeft.Pushball
+      internalID: -999063024157806334
+      firstFrame: 0
+      lastFrame: 28
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: MoveRight.Pushball
+      takeName: MoveRight.Pushball
+      internalID: -1473688908642841816
+      firstFrame: 0
+      lastFrame: 28
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
