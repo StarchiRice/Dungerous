@@ -44,6 +44,7 @@ public class PlayerController : MonoBehaviour
 
     public Transform ballTrans;
     private CharacterController ballCtrl;
+    private BallController ballLogic;
     public Transform groundCheck;
 
     private void Awake()
@@ -75,6 +76,7 @@ public class PlayerController : MonoBehaviour
     {
         charCtrl = GetComponent<CharacterController>();
         ballCtrl = ballTrans.gameObject.GetComponent<CharacterController>();
+        ballLogic = ballTrans.gameObject.GetComponent<BallController>();
         anim = GetComponent<Animator>();
     }
 
@@ -83,13 +85,14 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround);
 
-        if (Vector3.Distance(transform.position, ballTrans.position) > maxDistancetToBall)
+        if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > maxDistancetToBall || Vector3.Distance(Vector3.up * transform.position.y, Vector3.up * ballTrans.position.y) > maxDistancetToBall * 0.55f)
         {
             isRolling = false;
         }
 
         if (!isRolling)
         {
+            ballLogic.freeRoll = true;
             if(isGrounded)
             {
                 if(controls.Gameplay.Jump.WasPressedThisFrame())
@@ -106,6 +109,10 @@ public class PlayerController : MonoBehaviour
             }
             isMovingBall = false;
             MoveIndependent();
+        }
+        else
+        {
+            ballLogic.freeRoll = false;
         }
         Animate();
     }
@@ -146,11 +153,15 @@ public class PlayerController : MonoBehaviour
         moveDirectionR = transform.TransformDirection(new Vector3(moveRInput.x, 0, moveRInput.y));
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(ballTrans.position.x - transform.position.x, 0, ballTrans.position.z - transform.position.z)), rotateSpeed * Time.deltaTime);
         model.transform.localEulerAngles = Vector3.zero;
-        if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > ballRollDistance)
+        if (Vector3.Distance(Vector3.up * transform.position.y, Vector3.up * ballTrans.position.y) > ballRollDistance * 0.45f)
         {
             charCtrl.Move((ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
         }
-        else if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) < ballRollDistance * 0.9f)
+        else if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > ballRollDistance)
+        {
+            charCtrl.Move((ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
+        }
+        else if (Vector3.Distance(transform.position, ballTrans.position) < ballRollDistance * 0.8f)
         {
             charCtrl.Move(-(ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
         }
@@ -158,12 +169,13 @@ public class PlayerController : MonoBehaviour
         {
             isMovingBall = true;
             charCtrl.Move(new Vector3(moveDirectionR.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirectionR.normalized.z * rollMoveSpeed) * Time.deltaTime);
-            ballCtrl.Move(charCtrl.velocity * Time.deltaTime);
+            ballCtrl.Move(new Vector3(moveDirectionR.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirectionR.normalized.z * rollMoveSpeed) * Time.deltaTime);
         }
         else
         {
             isMovingBall = false;
             charCtrl.Move(new Vector3(transform.right.x * moveDirection.x * rollMoveSpeed, Physics.gravity.y, transform.right.z * moveDirection.x * rollMoveSpeed) * Time.deltaTime);
+            ballCtrl.Move(new Vector3(0, Physics.gravity.y, 0) * Time.deltaTime);
         }
         
 
