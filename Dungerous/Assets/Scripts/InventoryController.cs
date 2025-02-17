@@ -15,15 +15,20 @@ public class InventoryController : MonoBehaviour
     public Vector3 camOffset;
     private Vector3 ballRightDir;
 
+    public RaycastHit inventoryRaySelect;
+
     //References
     public Camera inventoryCam;
     private PlayerController player;
+    [HideInInspector]
+    public EquipmentController equipCtrl;
 
     // Start is called before the first frame update
     void Start()
     {
         inventoryCam.transform.parent = null;
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        equipCtrl = player.GetComponent<EquipmentController>();
     }
 
     // Update is called once per frame
@@ -64,6 +69,15 @@ public class InventoryController : MonoBehaviour
     public void CloseInventory()
     {
         inventoryCam.depth = -1;
+    }
+
+    public void SelectItem()
+    {
+        if (Physics.Raycast(inventoryCam.transform.position, inventoryCam.transform.forward, out inventoryRaySelect, 2.5f, whatIsPickupable))
+        {
+            equipCtrl.EquipItem(inventoryRaySelect.collider.GetComponent<BasicItemSolver>().itemID, inventoryRaySelect.collider.transform.position);
+            Destroy(inventoryRaySelect.collider.gameObject);
+        }
     }
 
     private void OnDrawGizmosSelected()

@@ -101,10 +101,16 @@ public class PlayerController : MonoBehaviour
             ballLogic.freeRoll = true;
             if(isGrounded)
             {
+                //Initialize the jump
                 if(controls.Gameplay.Jump.WasPressedThisFrame())
                 {
                     anim.SetTrigger("Jump");
                     jumpTime = maxJumpTime;
+                }
+                //Drop cur item on the floor
+                if (controls.Gameplay.Inventory.WasPressedThisFrame())
+                {
+                    inventoryCtrl.equipCtrl.DropItem(transform.position + (transform.forward * 2.5f));
                 }
             }
             
@@ -118,6 +124,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            //Inventory Toggle
             if(isGrounded)
             {
                 if (controls.Gameplay.Inventory.WasPressedThisFrame())
@@ -131,6 +138,13 @@ public class PlayerController : MonoBehaviour
                     {
                         checkingInventory = false;
                         inventoryCtrl.CloseInventory();
+                    }
+                }
+                if (checkingInventory == true)
+                {
+                    if (controls.Gameplay.Jump.WasPressedThisFrame())
+                    {
+                        inventoryCtrl.SelectItem();
                     }
                 }
             }

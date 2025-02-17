@@ -2,8 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicItemSolver : MonoBehaviour
+public class BasicEqupmentSolver : MonoBehaviour
 {
+    //Variables
+
+
+    //References
+    public GameObject dropItem;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -13,10 +19,6 @@ public class BasicItemSolver : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(transform.parent != null)
-        {
-            GetComponent<Rigidbody>().isKinematic = true;
-            GetComponent<Collider>().enabled = false;
-        }
+        
     }
 }
