@@ -22,5 +22,10 @@ public class BasicItemSolver : MonoBehaviour
             GetComponent<Rigidbody>().isKinematic = true;
             GetComponent<Collider>().isTrigger = true;
         }
+        else
+        {
+            GetComponent<Rigidbody>().isKinematic = false;
+            GetComponent<Collider>().isTrigger = false;
+        }
     }
 }

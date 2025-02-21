@@ -11,10 +11,15 @@ public class BallController : MonoBehaviour
 
     public bool freeRoll;
 
+    public bool canRide;
+    public Transform ballRideCheck, ballRidePoint;
+    public float rideCheckRadius;
+    public LayerMask whatCanRide;
+
     //References
     public GameObject ballModel;
     private CharacterController ctrl;
-    private Rigidbody rb;
+    public Rigidbody rb;
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +36,16 @@ public class BallController : MonoBehaviour
             ctrl.transform.rotation = Quaternion.LookRotation(new Vector3(ctrl.velocity.x, 0, ctrl.velocity.z));
         }
 
-        ballModel.transform.position = new Vector3(transform.position.x, transform.position.y + 2.5f, transform.position.z);
+        ballModel.transform.position = Vector3.MoveTowards(ballModel.transform.position, new Vector3(transform.position.x, transform.position.y + 2.4f, transform.position.z), 50 * Time.deltaTime);
+
+        if(Physics.CheckSphere(ballRideCheck.position, rideCheckRadius, whatCanRide))
+        {
+            canRide = true;
+        }
+        else
+        {
+            canRide = false;
+        }
     }
 
     // Update is called once per frame
@@ -60,5 +74,16 @@ public class BallController : MonoBehaviour
             float alpha = (dist * 180.0f) / (Mathf.PI * 0.37f);
             ballModel.transform.Rotate(ballRightDir, alpha * rollSpeedModifier, Space.World);
         }
+    }
+
+    public void BallRide()
+    {
+        freeRoll = true;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(ballRideCheck.position, rideCheckRadius);
     }
 }

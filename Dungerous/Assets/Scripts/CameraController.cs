@@ -7,6 +7,7 @@ public class CameraController : MonoBehaviour
     //Variables
     public Transform target;
     public Transform pivot;
+    public Transform obstructCheck;
 
     public float freeCamSpeed;
 
@@ -14,8 +15,15 @@ public class CameraController : MonoBehaviour
     private Vector3 startPos;
     private Vector3 startEuler;
 
-    public Vector3 ballFocusOffset, playerFocusOffset;
+    public Vector3 ballFocusOffset, playerFocusOffset, ballAdjustedFocusOffset;
     public float maxZoom, minZoom, zoomSpeed, startZoom;
+
+    public float playerToBallHeightVary;
+
+    public Vector3 obstructTargetOffset;
+    public LayerMask whatIsObstruct;
+    public bool isObstructed;
+    public bool isCamObstructed;
 
     //References
     private PlayerController player;
@@ -40,6 +48,7 @@ public class CameraController : MonoBehaviour
     {
         CamMove();
         CamFocus();
+        CheckObstruct();
     }
 
     void CamFocus()
@@ -51,16 +60,70 @@ public class CameraController : MonoBehaviour
             pivot.transform.parent = player.transform;
             pivot.transform.position = target.position;
             pivot.transform.localEulerAngles = Vector3.Slerp(pivot.transform.localEulerAngles, Vector3.zero, followSpeed * Time.deltaTime);
-            transform.localPosition = Vector3.MoveTowards(transform.localPosition, ballFocusOffset, followSpeed * Time.deltaTime);
+            if (Mathf.Abs(player.transform.position.y - ball.transform.position.y) > playerToBallHeightVary)
+            {
+                obstructCheck.localPosition = ballAdjustedFocusOffset;
+                transform.localPosition = Vector3.MoveTowards(transform.localPosition, ballAdjustedFocusOffset, followSpeed * Time.deltaTime);
+            }
+            else if (isObstructed == false)
+            {
+                obstructCheck.localPosition = ballFocusOffset;
+                transform.localPosition = Vector3.MoveTowards(transform.localPosition, ballFocusOffset, followSpeed * Time.deltaTime);
+            }
+            else if(isCamObstructed)
+            {
+                transform.localPosition = Vector3.MoveTowards(transform.localPosition, Vector3.zero, followSpeed * 3 * Time.deltaTime);
+            }
             transform.LookAt(Vector3.Lerp(transform.position, target.position, followSpeed * Time.deltaTime));
         }
         else
         {
             target = player.transform;
+            obstructCheck.localPosition = playerFocusOffset;
             pivot.transform.parent = null;
             pivot.transform.position = Vector3.Slerp(pivot.transform.position, player.transform.position, followSpeed * Time.deltaTime);
-            transform.localPosition = Vector3.MoveTowards(transform.localPosition, playerFocusOffset, followSpeed * Time.deltaTime);
+            if (isObstructed == false)
+            {
+                transform.localPosition = Vector3.MoveTowards(transform.localPosition, playerFocusOffset, followSpeed * Time.deltaTime);
+            }
+            else if(isCamObstructed)
+            {
+                transform.localPosition = Vector3.MoveTowards(transform.localPosition, Vector3.zero, followSpeed * 3 * Time.deltaTime);
+            }
             transform.localEulerAngles = startEuler;
+        }
+        
+    }
+
+    void CheckObstruct()
+    {
+        if(player.isRolling)
+        {
+            obstructTargetOffset = Vector3.up * 4;
+        }
+        else
+        {
+            obstructTargetOffset = Vector3.up * 2;
+        }
+
+        Vector3 obstructTarget = target.transform.position + obstructTargetOffset;
+
+        if (Physics.Raycast(transform.position, obstructTarget - transform.position, Vector3.Distance(transform.position, obstructTarget), whatIsObstruct))
+        {
+            isCamObstructed = true;
+        }
+        else
+        {
+            isCamObstructed = false;
+        }
+
+        if (Physics.Raycast(obstructCheck.position, obstructTarget - obstructCheck.position, Vector3.Distance(obstructCheck.position, obstructTarget), whatIsObstruct))
+        {
+            isObstructed = true;
+        }
+        else
+        {
+            isObstructed = false;
         }
     }
 
@@ -71,7 +134,7 @@ public class CameraController : MonoBehaviour
             Vector3 lookRotation = new Vector3(0, player.moveRInput.x, 0);
             pivot.transform.eulerAngles += lookRotation * freeCamSpeed * Time.deltaTime;
 
-            if (player.moveRInput.y > 0.3f || player.moveRInput.y < -0.3f)
+            if (Mathf.Abs(player.moveRInput.y) > 0.3f)
             {
                 cam.fieldOfView += -player.moveRInput.y * zoomSpeed * Time.deltaTime;
             }

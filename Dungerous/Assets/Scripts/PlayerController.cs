@@ -18,12 +18,13 @@ public class PlayerController : MonoBehaviour
 
     private float jumpTime;
     public float maxJumpTime;
+    private float jumpTimeCutMod;
 
     public float groundCheckRadius;
     public bool isGrounded;
     public LayerMask whatIsGround;
 
-    public bool isRolling = false;
+    public bool isRolling = false, isRiding = false;
     public Vector2 moveLInput;
     public Vector2 moveRInput;
 
@@ -32,6 +33,10 @@ public class PlayerController : MonoBehaviour
     private bool isMovingBall;
 
     public float moveModelLeanAmount;
+
+    public float rideMoveSpeed;
+    public float ballRideAcceleration;
+    public float rideModeFollowSpeed;
 
     public bool checkingInventory;
 
@@ -46,7 +51,8 @@ public class PlayerController : MonoBehaviour
 
     public Transform ballTrans;
     private CharacterController ballCtrl;
-    private BallController ballLogic;
+    [HideInInspector]
+    public BallController ballLogic;
     public Transform groundCheck;
     private InventoryController inventoryCtrl;
 
@@ -87,68 +93,97 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround);
+
+        //Toggle riding the ball when on top
+        if(ballLogic.canRide)
+        {
+            if(controls.Gameplay.ModeToggle.WasPerformedThisFrame())
+            {
+                if (!isRiding)
+                {
+                    isRiding = true;
+                }
+                else
+                {
+                    isRiding = false;
+                }
+            }
+        }
 
         if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > maxDistancetToBall || Vector3.Distance(Vector3.up * transform.position.y, Vector3.up * ballTrans.position.y) > maxDistancetToBall * 0.55f)
         {
             isRolling = false;
         }
 
-        if (!isRolling)
+        if (!isRiding)
         {
-            checkingInventory = false;
-            inventoryCtrl.CloseInventory();
-            ballLogic.freeRoll = true;
-            if(isGrounded)
+            if (!isRolling)
             {
-                //Initialize the jump
-                if(controls.Gameplay.Jump.WasPressedThisFrame())
+                checkingInventory = false;
+                inventoryCtrl.CloseInventory();
+                ballLogic.freeRoll = true;
+                if (isGrounded)
                 {
-                    anim.SetTrigger("Jump");
-                    jumpTime = maxJumpTime;
+                    //Initialize the jump
+                    if (controls.Gameplay.Jump.WasPressedThisFrame())
+                    {
+                        anim.SetTrigger("Jump");
+                        jumpTime = maxJumpTime;
+                        jumpTimeCutMod = 0;
+                    }
+                    //Drop cur item on the floor
+                    if (controls.Gameplay.Inventory.WasPressedThisFrame())
+                    {
+                        inventoryCtrl.equipCtrl.DropItem(transform.position + (transform.forward * 2.5f));
+                    }
                 }
-                //Drop cur item on the floor
-                if (controls.Gameplay.Inventory.WasPressedThisFrame())
+                if (controls.Gameplay.Jump.WasReleasedThisFrame() && jumpTime > 0)
                 {
-                    inventoryCtrl.equipCtrl.DropItem(transform.position + (transform.forward * 2.5f));
+                    jumpTimeCutMod = jumpTime;
                 }
+
+                if (jumpTime > 0)
+                {
+                    Jump();
+                    jumpTime -= (1 + jumpTimeCutMod) * Time.deltaTime;
+                }
+                isMovingBall = false;
+                MoveIndependent();
             }
-            
-            if(jumpTime > 0)
+            else
             {
-                Jump();
-                jumpTime -= Time.deltaTime;
+                //Inventory Toggle
+                if (isGrounded)
+                {
+                    if (controls.Gameplay.Inventory.WasPressedThisFrame())
+                    {
+                        if (checkingInventory == false)
+                        {
+                            checkingInventory = true;
+                            inventoryCtrl.OpenInventory();
+                        }
+                        else
+                        {
+                            checkingInventory = false;
+                            inventoryCtrl.CloseInventory();
+                        }
+                    }
+                    if (checkingInventory == true)
+                    {
+                        if (controls.Gameplay.Jump.WasPressedThisFrame())
+                        {
+                            inventoryCtrl.SelectItem();
+                        }
+                    }
+                }
+                ballLogic.freeRoll = false;
             }
-            isMovingBall = false;
-            MoveIndependent();
         }
         else
         {
-            //Inventory Toggle
-            if(isGrounded)
-            {
-                if (controls.Gameplay.Inventory.WasPressedThisFrame())
-                {
-                    if (checkingInventory == false)
-                    {
-                        checkingInventory = true;
-                        inventoryCtrl.OpenInventory();
-                    }
-                    else
-                    {
-                        checkingInventory = false;
-                        inventoryCtrl.CloseInventory();
-                    }
-                }
-                if (checkingInventory == true)
-                {
-                    if (controls.Gameplay.Jump.WasPressedThisFrame())
-                    {
-                        inventoryCtrl.SelectItem();
-                    }
-                }
-            }
-            ballLogic.freeRoll = false;
+            RideBall();
         }
         Animate();
     }
@@ -213,8 +248,27 @@ public class PlayerController : MonoBehaviour
             charCtrl.Move(new Vector3(transform.right.x * moveDirection.x * rollMoveSpeed, Physics.gravity.y, transform.right.z * moveDirection.x * rollMoveSpeed) * Time.deltaTime);
             ballCtrl.Move(new Vector3(0, Physics.gravity.y, 0) * Time.deltaTime);
         }
-        
+    }
 
+    void RideBall()
+    {
+        moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
+        
+        ballLogic.BallRide();
+        transform.position = Vector3.Lerp(transform.position, ballLogic.ballRidePoint.position, rideModeFollowSpeed * Time.deltaTime);
+
+        ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), ballRideAcceleration * Time.deltaTime));
+        if (moveDirection != Vector3.zero)
+        {
+            isMoving = true;
+            model.transform.localRotation = Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount));
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed * Time.deltaTime);
+        }
+        else
+        {
+            model.transform.localEulerAngles = Vector3.zero;
+            isMoving = false;
+        }
     }
 
     void Animate()
