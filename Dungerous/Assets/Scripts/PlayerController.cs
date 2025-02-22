@@ -40,6 +40,12 @@ public class PlayerController : MonoBehaviour
 
     public bool checkingInventory;
 
+    private float shoveCooldownTime;
+    public float startShoveCooldownTime;
+    public Transform shovePoint;
+    public float shoveRadius, shoveForce;
+    public LayerMask whatCanShove;
+
     //References
     private CharacterController charCtrl;
     private PlayerControls controls;
@@ -55,6 +61,7 @@ public class PlayerController : MonoBehaviour
     public BallController ballLogic;
     public Transform groundCheck;
     private InventoryController inventoryCtrl;
+    private EquipmentController equipCtrl;
 
     private void Awake()
     {
@@ -87,6 +94,7 @@ public class PlayerController : MonoBehaviour
         ballCtrl = ballTrans.gameObject.GetComponent<CharacterController>();
         ballLogic = ballTrans.gameObject.GetComponent<BallController>();
         inventoryCtrl = ballTrans.gameObject.GetComponent<InventoryController>();
+        equipCtrl = GetComponent<EquipmentController>();
         anim = GetComponent<Animator>();
     }
 
@@ -151,6 +159,13 @@ public class PlayerController : MonoBehaviour
                 }
                 isMovingBall = false;
                 MoveIndependent();
+
+                //Initialize item use
+                if (controls.Gameplay.UseItem.WasPressedThisFrame())
+                {
+                    equipCtrl.UseItem();
+                }
+                shoveCooldownTime -= Time.deltaTime;
             }
             else
             {
@@ -271,6 +286,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void Shove()
+    {
+        if (shoveCooldownTime <= 0)
+        {
+            Collider shoveCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShove)[0];
+            if (shoveCol.GetComponent<Rigidbody>())
+            {
+                shoveCol.GetComponent<Rigidbody>().velocity += ((shoveCol.transform.position - transform.position) * shoveForce / shoveCol.GetComponent<Rigidbody>().mass);
+            }
+            shoveCooldownTime = startShoveCooldownTime;
+        }
+    }
+
     void Animate()
     {
         anim.SetBool("IsMoving", isMoving);
@@ -279,11 +307,15 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("RMoveYInput", moveRInput.y);
         anim.SetBool("IsRolling", isRolling);
         anim.SetBool("IsMovingBall", isMovingBall);
+        anim.SetBool("IsRiding", isRiding);
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(shovePoint.position, shoveRadius);
     }
 }

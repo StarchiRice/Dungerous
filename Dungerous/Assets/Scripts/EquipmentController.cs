@@ -17,17 +17,27 @@ public class EquipmentController : MonoBehaviour
 
     //References
     public Transform itemPoint;
+    private PlayerController player;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        player = GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void UseItem()
+    {
+        if(curItemID == 0)
+        {
+            //Shove
+            player.Shove();
+        }
     }
 
     public void EquipItem(int itemID, Vector3 lastItemPos)
