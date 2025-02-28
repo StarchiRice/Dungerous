@@ -38,6 +38,11 @@ public class EquipmentController : MonoBehaviour
             //Shove
             player.Shove();
         }
+        else if(curItemID == 1)
+        {
+            //Swing Sword
+            player.StartCoroutine(player.SwingSword());
+        }
     }
 
     public void EquipItem(int itemID, Vector3 lastItemPos)

@@ -46,6 +46,10 @@ public class PlayerController : MonoBehaviour
     public float shoveRadius, shoveForce;
     public LayerMask whatCanShove;
 
+    public float swordHitBoxRadius;
+    public Transform swordHitBoxPoint;
+    public LayerMask whatCanSwordHit;
+
     //References
     private CharacterController charCtrl;
     private PlayerControls controls;
@@ -54,6 +58,8 @@ public class PlayerController : MonoBehaviour
     public GameObject model;
     [HideInInspector]
     public CameraController cam;
+
+    public Transform armatureTorso;
 
     public Transform ballTrans;
     private CharacterController ballCtrl;
@@ -235,8 +241,8 @@ public class PlayerController : MonoBehaviour
 
     void MoveBall()
     {
-        moveDirection = new Vector3(moveLInput.x, 0, moveLInput.y);
-        moveDirectionR = transform.TransformDirection(new Vector3(moveRInput.x, 0, moveRInput.y));
+        moveDirectionR = new Vector3(moveRInput.x, 0, moveRInput.y);
+        moveDirection = transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(ballTrans.position.x - transform.position.x, 0, ballTrans.position.z - transform.position.z)), rotateSpeed * Time.deltaTime);
         model.transform.localEulerAngles = Vector3.zero;
         if (Vector3.Distance(Vector3.up * transform.position.y, Vector3.up * ballTrans.position.y) > ballRollDistance * 0.45f)
@@ -251,16 +257,16 @@ public class PlayerController : MonoBehaviour
         {
             charCtrl.Move(-(ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
         }
-        if(moveRInput != Vector2.zero)
+        if(moveLInput != Vector2.zero)
         {
             isMovingBall = true;
-            charCtrl.Move(new Vector3(moveDirectionR.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirectionR.normalized.z * rollMoveSpeed) * Time.deltaTime);
-            ballCtrl.Move(new Vector3(moveDirectionR.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirectionR.normalized.z * rollMoveSpeed) * Time.deltaTime);
+            charCtrl.Move(new Vector3(moveDirection.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirection.normalized.z * rollMoveSpeed) * Time.deltaTime);
+            ballCtrl.Move(new Vector3(moveDirection.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirection.normalized.z * rollMoveSpeed) * Time.deltaTime);
         }
         else
         {
             isMovingBall = false;
-            charCtrl.Move(new Vector3(transform.right.x * moveDirection.x * rollMoveSpeed, Physics.gravity.y, transform.right.z * moveDirection.x * rollMoveSpeed) * Time.deltaTime);
+            charCtrl.Move(new Vector3(transform.right.x * moveDirectionR.x * rollMoveSpeed, Physics.gravity.y, transform.right.z * moveDirectionR.x * rollMoveSpeed) * Time.deltaTime);
             ballCtrl.Move(new Vector3(0, Physics.gravity.y, 0) * Time.deltaTime);
         }
     }
@@ -290,24 +296,35 @@ public class PlayerController : MonoBehaviour
     {
         if (shoveCooldownTime <= 0)
         {
+            anim.SetTrigger("Shove");
+            shoveCooldownTime = startShoveCooldownTime;
             Collider shoveCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShove)[0];
             if (shoveCol.GetComponent<Rigidbody>())
             {
                 shoveCol.GetComponent<Rigidbody>().velocity += ((shoveCol.transform.position - transform.position) * shoveForce / shoveCol.GetComponent<Rigidbody>().mass);
             }
-            shoveCooldownTime = startShoveCooldownTime;
         }
+    }
+
+    public IEnumerator SwingSword()
+    {
+        yield return new WaitForSeconds(0);
+        //Collider swordCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit)[0];
+        anim.SetTrigger("SwingWeapon");
+        Debug.Log("SWING SWORD");
     }
 
     void Animate()
     {
         anim.SetBool("IsMoving", isMoving);
         anim.SetBool("IsGrounded", isGrounded);
-        anim.SetFloat("RMoveXInput", moveRInput.x);
-        anim.SetFloat("RMoveYInput", moveRInput.y);
+        anim.SetFloat("LMoveXInput", moveLInput.x);
+        anim.SetFloat("LMoveYInput", moveLInput.y);
         anim.SetBool("IsRolling", isRolling);
         anim.SetBool("IsMovingBall", isMovingBall);
         anim.SetBool("IsRiding", isRiding);
+        anim.SetFloat("RideSpeed", Mathf.Clamp( new Vector3(ballLogic.rb.velocity.x, 0, ballLogic.rb.velocity.z).magnitude * 0.5f, 0.1f, rideMoveSpeed));
+        anim.SetInteger("CurItem", equipCtrl.curItemID);
     }
 
     private void OnDrawGizmosSelected()

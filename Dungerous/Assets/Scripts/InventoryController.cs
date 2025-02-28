@@ -54,7 +54,7 @@ public class InventoryController : MonoBehaviour
 
     private void RollInventory()
     {
-        Vector3 ballDir = inventoryCam.transform.TransformDirection(new Vector3(-player.moveRInput.x, -player.moveRInput.y, 0)); ;
+        Vector3 ballDir = inventoryCam.transform.TransformDirection(new Vector3(-player.moveLInput.x, -player.moveLInput.y, 0)); ;
         ballRightDir = Vector3.Cross(Vector3.forward, ballDir);
         float dist = ballDir.magnitude * Time.deltaTime;
         float alpha = (dist * 180.0f) / (Mathf.PI * 0.37f);

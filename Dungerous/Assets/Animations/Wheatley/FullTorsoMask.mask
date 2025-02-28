@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: FullTorsoMask
+  m_Mask: 00000000010000000100000000000000000000000100000001000000010000000100000000000000000000000000000000000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Armature
+    m_Weight: 0
+  - m_Path: Armature/MainLower
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Abdomen
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/Head
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/Head/Head_end
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.L/BicepLower.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.L/BicepLower.L/ForearmLower.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.L/BicepLower.L/ForearmLower.L/HandLower.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.L/BicepLower.L/ForearmLower.L/HandLower.L/HandLower.L_end
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.R/BicepLower.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.R/BicepLower.R/ForearmLower.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.R/BicepLower.R/ForearmLower.R/HandLower.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderLower.R/BicepLower.R/ForearmLower.R/HandLower.R/HandLower.R_end
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.L/BicepUpper.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.L/BicepUpper.L/ForearmUpper.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.L/BicepUpper.L/ForearmUpper.L/HandUpper.L
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.L/BicepUpper.L/ForearmUpper.L/HandUpper.L/HandUpper.L_end
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.R/BicepUpper.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.R/BicepUpper.R/ForearmUpper.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.R/BicepUpper.R/ForearmUpper.R/HandUpper.R
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Abdomen/Torso/ShoulderUpper.R/BicepUpper.R/ForearmUpper.R/HandUpper.R/HandUpper.R_end
+    m_Weight: 1
+  - m_Path: Armature/MainLower/Waist/Thigh.L
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.L/Quad.L
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.L/Quad.L/Calf.L
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.L/Quad.L/Calf.L/Heel.L
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.L/Quad.L/Calf.L/Heel.L/Foot.L
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.L/Quad.L/Calf.L/Heel.L/Foot.L/Foot.L_end
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.R
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.R/Quad.R
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.R/Quad.R/Calf.R
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.R/Quad.R/Calf.R/Heel.R
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.R/Quad.R/Calf.R/Heel.R/Foot.R
+    m_Weight: 0
+  - m_Path: Armature/MainLower/Waist/Thigh.R/Quad.R/Calf.R/Heel.R/Foot.R/Foot.R_end
+    m_Weight: 0
+  - m_Path: Wheatley
+    m_Weight: 0
