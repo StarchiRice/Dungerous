@@ -49,6 +49,8 @@ public class PlayerController : MonoBehaviour
     public float swordHitBoxRadius;
     public Transform swordHitBoxPoint;
     public LayerMask whatCanSwordHit;
+    public float swordSwingBuffer;
+    private float curSwingBuffer;
 
     //References
     private CharacterController charCtrl;
@@ -206,6 +208,13 @@ public class PlayerController : MonoBehaviour
         {
             RideBall();
         }
+
+        //Tick down swing buffer
+        if(curSwingBuffer > 0)
+        {
+            curSwingBuffer -= Time.deltaTime;
+        }
+
         Animate();
     }
 
@@ -308,10 +317,23 @@ public class PlayerController : MonoBehaviour
 
     public IEnumerator SwingSword()
     {
+        if (curSwingBuffer <= 0)
+        {
+            curSwingBuffer = swordSwingBuffer;
+            //Collider swordCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit)[0];
+            anim.SetTrigger("SwingWeapon");
+            Debug.Log("SWING SWORD");
+            yield return new WaitForSeconds(0.075f);
+            equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
+            yield return new WaitForSeconds(0.2f);
+            equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
+        }
+    }
+
+    public IEnumerator ThrowBomb()
+    {
+        equipCtrl.curEquip.GetComponent<ProjectileItem>().ShootProjectile(transform.TransformDirection(new Vector3(0, 2, 0.75f)));
         yield return new WaitForSeconds(0);
-        //Collider swordCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit)[0];
-        anim.SetTrigger("SwingWeapon");
-        Debug.Log("SWING SWORD");
     }
 
     void Animate()

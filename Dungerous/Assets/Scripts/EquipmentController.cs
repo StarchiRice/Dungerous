@@ -28,7 +28,10 @@ public class EquipmentController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(curEquip == null)
+        {
+            curItemID = 0;
+        }
     }
 
     public void UseItem()
@@ -42,6 +45,11 @@ public class EquipmentController : MonoBehaviour
         {
             //Swing Sword
             player.StartCoroutine(player.SwingSword());
+        }
+        else if(curItemID == 2)
+        {
+            //Throw Bomb
+            player.StartCoroutine(player.ThrowBomb());
         }
     }
 
