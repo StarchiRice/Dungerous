@@ -20,6 +20,10 @@ public class PlayerController : MonoBehaviour
     public float maxJumpTime;
     private float jumpTimeCutMod;
 
+    public float wallShoveForce;
+    public float maxWallShoveTime;
+    private float wallShoveTime;
+
     public float groundCheckRadius;
     public bool isGrounded;
     public LayerMask whatIsGround;
@@ -45,12 +49,15 @@ public class PlayerController : MonoBehaviour
     public Transform shovePoint;
     public float shoveRadius, shoveForce;
     public LayerMask whatCanShove;
+    public LayerMask whatCanShoveOff;
+    public float moveOutOfShoveOffTime;
 
     public float swordHitBoxRadius;
     public Transform swordHitBoxPoint;
     public LayerMask whatCanSwordHit;
     public float swordSwingBuffer;
     private float curSwingBuffer;
+    public bool isAttacking;
 
     //References
     private CharacterController charCtrl;
@@ -165,6 +172,12 @@ public class PlayerController : MonoBehaviour
                     Jump();
                     jumpTime -= (1 + jumpTimeCutMod) * Time.deltaTime;
                 }
+                if(wallShoveTime > 0)
+                {
+                    WallShove();
+                    jumpTime = 0;
+                    wallShoveTime -= Time.deltaTime;
+                }
                 isMovingBall = false;
                 MoveIndependent();
 
@@ -228,8 +241,15 @@ public class PlayerController : MonoBehaviour
 
     void MoveIndependent()
     {
-        moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
-        charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, Physics.gravity.y, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
+        if (wallShoveTime <= moveOutOfShoveOffTime)
+        {
+            moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
+        }
+        charCtrl.Move((Vector3.up * Physics.gravity.y) * Time.deltaTime);
+        if (wallShoveTime <= moveOutOfShoveOffTime)
+        {
+            charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, 0, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
+        }
         if (moveDirection != Vector3.zero)
         {
             isMoving = true;
@@ -307,12 +327,29 @@ public class PlayerController : MonoBehaviour
         {
             anim.SetTrigger("Shove");
             shoveCooldownTime = startShoveCooldownTime;
-            Collider shoveCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShove)[0];
-            if (shoveCol.GetComponent<Rigidbody>())
+            if (Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShove))
             {
-                shoveCol.GetComponent<Rigidbody>().velocity += ((shoveCol.transform.position - transform.position) * shoveForce / shoveCol.GetComponent<Rigidbody>().mass);
+                Collider shoveCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShove)[0];
+                if (shoveCol.GetComponent<Rigidbody>())
+                {
+                    shoveCol.GetComponent<Rigidbody>().velocity += ((shoveCol.transform.position - transform.position) * shoveForce / shoveCol.GetComponent<Rigidbody>().mass);
+                }
+            }
+            else if(Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShoveOff))
+            {
+                Collider shoveOffCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShoveOff)[0];
+                if (shoveOffCol != null)
+                {
+                    wallShoveTime = maxWallShoveTime;
+                    shoveCooldownTime = startShoveCooldownTime / 3;
+                }
             }
         }
+    }
+
+    public void WallShove()
+    {
+        charCtrl.Move(transform.TransformDirection(new Vector3(0, 1.35f, -0.5f)) * wallShoveForce * wallShoveTime * Time.deltaTime);
     }
 
     public IEnumerator SwingSword()
@@ -320,12 +357,14 @@ public class PlayerController : MonoBehaviour
         if (curSwingBuffer <= 0)
         {
             curSwingBuffer = swordSwingBuffer;
+            isAttacking = true;
             //Collider swordCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit)[0];
             anim.SetTrigger("SwingWeapon");
             Debug.Log("SWING SWORD");
             yield return new WaitForSeconds(0.075f);
             equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
             yield return new WaitForSeconds(0.2f);
+            isAttacking = false;
             equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
         }
     }
@@ -356,5 +395,11 @@ public class PlayerController : MonoBehaviour
 
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(shovePoint.position, shoveRadius);
+
+        if (isAttacking)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(swordHitBoxPoint.position, swordHitBoxRadius);
+        }
     }
 }
