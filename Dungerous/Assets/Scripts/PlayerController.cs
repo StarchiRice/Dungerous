@@ -24,6 +24,14 @@ public class PlayerController : MonoBehaviour
     public float maxWallShoveTime;
     private float wallShoveTime;
 
+    public float shoveHighJumpForce;
+    public float maxShoveHighJumpTime;
+    private float shoveHighJumpTime;
+    public bool highJumpReady;
+    public float maxHighJumpBuffer;
+    private float highJumpBuffer;
+    public int highJumpLimit;
+
     public float groundCheckRadius;
     public bool isGrounded;
     public LayerMask whatIsGround;
@@ -147,26 +155,54 @@ public class PlayerController : MonoBehaviour
                 checkingInventory = false;
                 inventoryCtrl.CloseInventory();
                 ballLogic.freeRoll = true;
-                if (isGrounded)
+                if (!highJumpReady)
                 {
-                    //Initialize the jump
-                    if (controls.Gameplay.Jump.WasPressedThisFrame())
+                    if (isGrounded)
                     {
-                        anim.SetTrigger("Jump");
-                        jumpTime = maxJumpTime;
-                        jumpTimeCutMod = 0;
+                        //Initialize the jump
+                        if (controls.Gameplay.Jump.WasPressedThisFrame())
+                        {
+                            anim.SetTrigger("Jump");
+                            jumpTime = maxJumpTime;
+                            jumpTimeCutMod = 0;
+                        }
+                        //Drop cur item on the floor
+                        if (controls.Gameplay.Inventory.WasPressedThisFrame())
+                        {
+                            inventoryCtrl.equipCtrl.DropItem(transform.position + (transform.forward * 2.5f));
+                        }
                     }
-                    //Drop cur item on the floor
-                    if (controls.Gameplay.Inventory.WasPressedThisFrame())
+                    if (controls.Gameplay.Jump.WasReleasedThisFrame() && jumpTime > 0)
                     {
-                        inventoryCtrl.equipCtrl.DropItem(transform.position + (transform.forward * 2.5f));
+                        jumpTimeCutMod = jumpTime;
                     }
-                }
-                if (controls.Gameplay.Jump.WasReleasedThisFrame() && jumpTime > 0)
-                {
-                    jumpTimeCutMod = jumpTime;
                 }
 
+                //High Jump Logic
+                if (controls.Gameplay.HoldUseItem.WasPerformedThisFrame() && isGrounded == false && highJumpReady == false && wallShoveTime <= 0 && shoveHighJumpTime <= 0 && highJumpLimit <= 0 && equipCtrl.curItemID == 0)
+                {
+                    highJumpReady = true;
+                    highJumpBuffer = maxHighJumpBuffer;
+                }
+                else if(controls.Gameplay.HoldUseItem.WasReleasedThisFrame() && isGrounded == true && highJumpReady && equipCtrl.curItemID == 0)
+                {
+                    highJumpReady = false;
+                    highJumpLimit++;
+                    shoveHighJumpTime = maxShoveHighJumpTime;
+                }
+                else if(highJumpReady && highJumpBuffer <= 0 && isGrounded)
+                {
+                    highJumpReady = false;
+                    highJumpLimit++;
+                    shoveHighJumpTime = maxShoveHighJumpTime;
+                }
+
+                if (highJumpBuffer > 0 && isGrounded)
+                {
+                    highJumpBuffer -= Time.deltaTime;
+                }
+
+                //Manage Jumps
                 if (jumpTime > 0)
                 {
                     Jump();
@@ -176,8 +212,22 @@ public class PlayerController : MonoBehaviour
                 {
                     WallShove();
                     jumpTime = 0;
+                    highJumpReady = false;
+                    shoveHighJumpTime = 0;
                     wallShoveTime -= Time.deltaTime;
                 }
+                if(shoveHighJumpTime > 0)
+                {
+                    ShoveHighJump();
+                    shoveCooldownTime = 0;
+                    jumpTime = 0;
+                    shoveHighJumpTime -= Time.deltaTime;
+                }
+                else if(isGrounded)
+                {
+                    highJumpLimit = 0;
+                }
+
                 isMovingBall = false;
                 MoveIndependent();
 
@@ -246,10 +296,15 @@ public class PlayerController : MonoBehaviour
             moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
         }
         charCtrl.Move((Vector3.up * Physics.gravity.y) * Time.deltaTime);
-        if (wallShoveTime <= moveOutOfShoveOffTime)
+        if(isGrounded == true && highJumpReady)
+        {
+            charCtrl.Move(Vector3.zero);
+        }
+        else if (wallShoveTime <= moveOutOfShoveOffTime)
         {
             charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, 0, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
         }
+
         if (moveDirection != Vector3.zero)
         {
             isMoving = true;
@@ -338,7 +393,7 @@ public class PlayerController : MonoBehaviour
             else if(Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShoveOff))
             {
                 Collider shoveOffCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShoveOff)[0];
-                if (shoveOffCol != null)
+                if (shoveOffCol != null && isGrounded == false)
                 {
                     wallShoveTime = maxWallShoveTime;
                     shoveCooldownTime = startShoveCooldownTime / 3;
@@ -350,6 +405,11 @@ public class PlayerController : MonoBehaviour
     public void WallShove()
     {
         charCtrl.Move(transform.TransformDirection(new Vector3(0, 1.35f, -0.5f)) * wallShoveForce * wallShoveTime * Time.deltaTime);
+    }
+
+    public void ShoveHighJump()
+    {
+        charCtrl.Move(Vector3.up * shoveHighJumpForce * shoveHighJumpTime * Time.deltaTime);
     }
 
     public IEnumerator SwingSword()
@@ -371,7 +431,7 @@ public class PlayerController : MonoBehaviour
 
     public IEnumerator ThrowBomb()
     {
-        equipCtrl.curEquip.GetComponent<ProjectileItem>().ShootProjectile(transform.TransformDirection(new Vector3(0, 2, 0.75f)));
+        equipCtrl.curEquip.GetComponent<ProjectileItem>().ShootProjectile(transform.TransformDirection(new Vector3(0, 1.75f, 1f)));
         yield return new WaitForSeconds(0);
     }
 
@@ -386,6 +446,7 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("IsRiding", isRiding);
         anim.SetFloat("RideSpeed", Mathf.Clamp( new Vector3(ballLogic.rb.velocity.x, 0, ballLogic.rb.velocity.z).magnitude * 0.5f, 0.1f, rideMoveSpeed));
         anim.SetInteger("CurItem", equipCtrl.curItemID);
+        anim.SetBool("HighJumpReady", highJumpReady);
     }
 
     private void OnDrawGizmosSelected()

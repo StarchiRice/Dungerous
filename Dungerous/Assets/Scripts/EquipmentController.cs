@@ -15,6 +15,10 @@ public class EquipmentController : MonoBehaviour
 
     public Vector3 lastItemPosition;
 
+    public Transform pickupPoint;
+    public float pickupRadius;
+    public LayerMask whatIsPickupable;
+
     //References
     public Transform itemPoint;
     private PlayerController player;
@@ -31,6 +35,19 @@ public class EquipmentController : MonoBehaviour
         if(curEquip == null)
         {
             curItemID = 0;
+        }
+
+        if (Physics.CheckSphere(pickupPoint.position, pickupRadius, whatIsPickupable))
+        {
+            if (curEquip == null)
+            {
+                Collider pickupItem = Physics.OverlapSphere(pickupPoint.position, pickupRadius, whatIsPickupable)[0];
+                if(pickupItem.transform.parent == null)
+                {
+                    EquipItem(pickupItem.GetComponent<BasicItemSolver>().itemID, lastItemPosition);
+                    Destroy(pickupItem.gameObject);
+                }
+            }
         }
     }
 
@@ -71,5 +88,11 @@ public class EquipmentController : MonoBehaviour
             Destroy(curEquip);
             curItemID = 0;
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(pickupPoint.position, pickupRadius);
     }
 }

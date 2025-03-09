@@ -61,7 +61,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e80b650fca9fd82458430218e5daa14e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  throwForce: 12
+  throwForce: 15
   shootPoint: {fileID: 7513081890488667061}
   consumableItem: 1
   projObj: {fileID: 1118791694685078620, guid: 700982d4ccbcf2344aaffdd51fb2218f, type: 3}

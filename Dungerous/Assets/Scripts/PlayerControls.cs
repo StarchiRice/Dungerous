@@ -73,12 +73,21 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Use Item"",
+                    ""name"": ""UseItem"",
                     ""type"": ""Button"",
                     ""id"": ""5b087834-5fc6-4a06-bb2d-3d903f4aa8bd"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HoldUseItem"",
+                    ""type"": ""Button"",
+                    ""id"": ""4ea042c9-25f3-47a9-b67f-cc92981dd013"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Hold(duration=0.2)"",
                     ""initialStateCheck"": false
                 }
             ],
@@ -145,7 +154,18 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Use Item"",
+                    ""action"": ""UseItem"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0a61b492-5bc2-4add-8ce0-42360860ccab"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""HoldUseItem"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -173,7 +193,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_ModeToggle = m_Gameplay.FindAction("ModeToggle", throwIfNotFound: true);
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_Inventory = m_Gameplay.FindAction("Inventory", throwIfNotFound: true);
-        m_Gameplay_UseItem = m_Gameplay.FindAction("Use Item", throwIfNotFound: true);
+        m_Gameplay_UseItem = m_Gameplay.FindAction("UseItem", throwIfNotFound: true);
+        m_Gameplay_HoldUseItem = m_Gameplay.FindAction("HoldUseItem", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -241,6 +262,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Jump;
     private readonly InputAction m_Gameplay_Inventory;
     private readonly InputAction m_Gameplay_UseItem;
+    private readonly InputAction m_Gameplay_HoldUseItem;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -251,6 +273,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
         public InputAction @Inventory => m_Wrapper.m_Gameplay_Inventory;
         public InputAction @UseItem => m_Wrapper.m_Gameplay_UseItem;
+        public InputAction @HoldUseItem => m_Wrapper.m_Gameplay_HoldUseItem;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -278,6 +301,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @UseItem.started += instance.OnUseItem;
             @UseItem.performed += instance.OnUseItem;
             @UseItem.canceled += instance.OnUseItem;
+            @HoldUseItem.started += instance.OnHoldUseItem;
+            @HoldUseItem.performed += instance.OnHoldUseItem;
+            @HoldUseItem.canceled += instance.OnHoldUseItem;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -300,6 +326,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @UseItem.started -= instance.OnUseItem;
             @UseItem.performed -= instance.OnUseItem;
             @UseItem.canceled -= instance.OnUseItem;
+            @HoldUseItem.started -= instance.OnHoldUseItem;
+            @HoldUseItem.performed -= instance.OnHoldUseItem;
+            @HoldUseItem.canceled -= instance.OnHoldUseItem;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -334,5 +363,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnInventory(InputAction.CallbackContext context);
         void OnUseItem(InputAction.CallbackContext context);
+        void OnHoldUseItem(InputAction.CallbackContext context);
     }
 }
