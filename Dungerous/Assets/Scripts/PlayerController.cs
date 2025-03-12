@@ -66,6 +66,10 @@ public class PlayerController : MonoBehaviour
     public float swordSwingBuffer;
     private float curSwingBuffer;
     public bool isAttacking;
+    public int attackStage;
+    public int maxAttackStage;
+    public float attackStageResetBuffer;
+    private float curAttackStageResetBuffer;
 
     //References
     private CharacterController charCtrl;
@@ -128,7 +132,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround);
 
         //Toggle riding the ball when on top
-        if(ballLogic.canRide)
+        if(ballLogic.canRide && highJumpReady == false)
         {
             if(controls.Gameplay.ModeToggle.WasPerformedThisFrame())
             {
@@ -143,7 +147,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > maxDistancetToBall || Vector3.Distance(Vector3.up * transform.position.y, Vector3.up * ballTrans.position.y) > maxDistancetToBall * 0.55f)
+        if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > maxDistancetToBall || Vector3.Distance(Vector3.up * transform.position.y, Vector3.up * ballTrans.position.y) > maxDistancetToBall * 0.55f || highJumpReady)
         {
             isRolling = false;
         }
@@ -278,12 +282,21 @@ public class PlayerController : MonoBehaviour
             curSwingBuffer -= Time.deltaTime;
         }
 
+        if(curAttackStageResetBuffer > 0)
+        {
+            curAttackStageResetBuffer -= Time.deltaTime;
+        }
+        else
+        {
+            attackStage = 0;
+        }
+
         Animate();
     }
 
     private void FixedUpdate()
     {
-        if(isRolling && checkingInventory == false)
+        if(isRolling && checkingInventory == false && highJumpReady == false)
         {
             MoveBall();
         }
@@ -412,13 +425,15 @@ public class PlayerController : MonoBehaviour
         charCtrl.Move(Vector3.up * shoveHighJumpForce * shoveHighJumpTime * Time.deltaTime);
     }
 
-    public IEnumerator SwingSword()
+    public IEnumerator SwingSword(bool overrideSwing)
     {
-        if (curSwingBuffer <= 0)
+        if (curSwingBuffer <= 0 || overrideSwing)
         {
             curSwingBuffer = swordSwingBuffer;
+            curAttackStageResetBuffer = attackStageResetBuffer;
             isAttacking = true;
             //Collider swordCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit)[0];
+            anim.ResetTrigger("SwingWeapon");
             anim.SetTrigger("SwingWeapon");
             Debug.Log("SWING SWORD");
             yield return new WaitForSeconds(0.075f);
@@ -426,6 +441,12 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             isAttacking = false;
             equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
+            anim.ResetTrigger("SwingWeapon");
+        }
+        else if(attackStage < maxAttackStage && curAttackStageResetBuffer > 0)
+        {
+            attackStage++;
+            StartCoroutine(SwingSword(true));
         }
     }
 
@@ -447,6 +468,7 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("RideSpeed", Mathf.Clamp( new Vector3(ballLogic.rb.velocity.x, 0, ballLogic.rb.velocity.z).magnitude * 0.5f, 0.1f, rideMoveSpeed));
         anim.SetInteger("CurItem", equipCtrl.curItemID);
         anim.SetBool("HighJumpReady", highJumpReady);
+        anim.SetInteger("AttackStage", attackStage);
     }
 
     private void OnDrawGizmosSelected()

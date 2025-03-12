@@ -61,7 +61,7 @@ public class EquipmentController : MonoBehaviour
         else if(curItemID == 1)
         {
             //Swing Sword
-            player.StartCoroutine(player.SwingSword());
+            player.StartCoroutine(player.SwingSword(false));
         }
         else if(curItemID == 2)
         {
