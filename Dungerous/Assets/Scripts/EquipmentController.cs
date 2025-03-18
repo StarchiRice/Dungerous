@@ -53,15 +53,15 @@ public class EquipmentController : MonoBehaviour
 
     public void UseItem()
     {
-        if(curItemID == 0)
+        if (curItemID == 0)
         {
             //Shove
             player.Shove();
         }
-        else if(curItemID == 1)
+        else if (curItemID == 1)
         {
             //Swing Sword
-            player.StartCoroutine(player.SwingSword(false));
+            player.SwingSword(false);
         }
         else if(curItemID == 2)
         {

@@ -5,10 +5,11 @@ using UnityEngine;
 public class BasicEqupmentSolver : MonoBehaviour
 {
     //Variables
-
+    public Transform trailParent;
 
     //References
     public GameObject dropItem;
+    public GameObject trailEffect;
 
     // Start is called before the first frame update
     void Start()

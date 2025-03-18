@@ -60,16 +60,27 @@ public class PlayerController : MonoBehaviour
     public LayerMask whatCanShoveOff;
     public float moveOutOfShoveOffTime;
 
+    ///Sword Vars
     public float swordHitBoxRadius;
     public Transform swordHitBoxPoint;
     public LayerMask whatCanSwordHit;
     public float swordSwingBuffer;
-    private float curSwingBuffer;
+    public float hardSwingBuffer;
+    public float curSwingBuffer;
     public bool isAttacking;
     public int attackStage;
     public int maxAttackStage;
     public float attackStageResetBuffer;
-    private float curAttackStageResetBuffer;
+    public float curAttackStageResetBuffer;
+    private bool followUpAttackDone;
+
+    public bool swordSpinReady;
+    public float swordSpinDuration;
+    public float curSwordSpinDuration;
+    public float swordSpinCooldown;
+    private float curSwordSpinCooldown;
+    public float spinSpeed;
+    public float spinMoveSpeed;
 
     //References
     private CharacterController charCtrl;
@@ -232,6 +243,28 @@ public class PlayerController : MonoBehaviour
                     highJumpLimit = 0;
                 }
 
+                //Sword Spin Logic
+                if (controls.Gameplay.HoldUseItem.WasPerformedThisFrame() && equipCtrl.curItemID == 1 && curSwordSpinCooldown <= 0)
+                {
+                    swordSpinReady = true;
+                }
+                else if (controls.Gameplay.HoldUseItem.WasReleasedThisFrame() && isGrounded == true && swordSpinReady && equipCtrl.curItemID == 1)
+                {
+                    curSwordSpinDuration = swordSpinDuration;
+                    curSwordSpinCooldown = swordSpinCooldown;
+                    swordSpinReady = false;
+                }
+
+                if(curSwordSpinDuration > 0)
+                {
+                    SwordSpin();
+                    curSwordSpinDuration -= Time.deltaTime;
+                }
+                else
+                {
+                    curSwordSpinDuration = 0;
+                }
+
                 isMovingBall = false;
                 MoveIndependent();
 
@@ -282,13 +315,64 @@ public class PlayerController : MonoBehaviour
             curSwingBuffer -= Time.deltaTime;
         }
 
-        if(curAttackStageResetBuffer > 0)
+        //Manage Follow Up Sword Swing/Sword Spin
+
+        if (curAttackStageResetBuffer > 0)
         {
+            if (equipCtrl.curItemID == 1)
+            {
+                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
+            }
+            isAttacking = true;
             curAttackStageResetBuffer -= Time.deltaTime;
+        }
+        else if(curSwordSpinDuration <= 0)
+        {
+            if (equipCtrl.curItemID == 1)
+            {
+                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
+            }
+            isAttacking = false;
+            if (attackStage > 1)
+            {
+                if (followUpAttackDone == false)
+                {
+                    SwingSword(true);
+                    followUpAttackDone = true;
+                }
+            }
+            else
+            {
+                attackStage = 0;
+            }
+        }
+
+        if (curSwordSpinDuration <= 0)
+        {
+            if (curSwordSpinCooldown > 0)
+            {
+                curSwordSpinCooldown -= Time.deltaTime;
+            }
+            else
+            {
+                curSwordSpinCooldown = 0;
+            }
+        }
+        else if(curSwordSpinDuration > 0.3f)
+        {
+            if (equipCtrl.curItemID == 1)
+            {
+                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
+            }
+            isAttacking = true;
         }
         else
         {
-            attackStage = 0;
+            if (equipCtrl.curItemID == 1)
+            {
+                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
+            }
+            isAttacking = false;
         }
 
         Animate();
@@ -313,6 +397,10 @@ public class PlayerController : MonoBehaviour
         {
             charCtrl.Move(Vector3.zero);
         }
+        else if(curSwordSpinDuration > 0)
+        {
+            charCtrl.Move(new Vector3(moveDirection.normalized.x * spinMoveSpeed, 0, moveDirection.normalized.z * spinMoveSpeed) * Time.deltaTime);
+        }
         else if (wallShoveTime <= moveOutOfShoveOffTime)
         {
             charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, 0, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
@@ -321,8 +409,11 @@ public class PlayerController : MonoBehaviour
         if (moveDirection != Vector3.zero)
         {
             isMoving = true;
-            model.transform.localRotation = Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount));
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed * Time.deltaTime);
+            if (curSwordSpinDuration <= 0.3f)
+            {
+                model.transform.localRotation = Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount));
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed * Time.deltaTime);
+            }
         }
         else
         {
@@ -425,29 +516,40 @@ public class PlayerController : MonoBehaviour
         charCtrl.Move(Vector3.up * shoveHighJumpForce * shoveHighJumpTime * Time.deltaTime);
     }
 
-    public IEnumerator SwingSword(bool overrideSwing)
+    public void SwingSword(bool followUpSwing)
     {
-        if (curSwingBuffer <= 0 || overrideSwing)
+        if (curSwingBuffer <= 0 || (followUpSwing && !followUpAttackDone))
         {
-            curSwingBuffer = swordSwingBuffer;
+            if (!followUpSwing)
+            {
+                curSwingBuffer = swordSwingBuffer;
+                attackStage++;
+                followUpAttackDone = false;
+            }
+            else
+            {
+                curSwingBuffer = hardSwingBuffer;
+            }
             curAttackStageResetBuffer = attackStageResetBuffer;
-            isAttacking = true;
-            //Collider swordCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit)[0];
-            anim.ResetTrigger("SwingWeapon");
-            anim.SetTrigger("SwingWeapon");
-            Debug.Log("SWING SWORD");
-            yield return new WaitForSeconds(0.075f);
-            equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
-            yield return new WaitForSeconds(0.2f);
-            isAttacking = false;
-            equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
-            anim.ResetTrigger("SwingWeapon");
+            
+            if(followUpSwing)
+            {
+                attackStage = 0;
+            }
+            else
+            {
+                anim.SetTrigger("SwingWeapon");
+            }
         }
-        else if(attackStage < maxAttackStage && curAttackStageResetBuffer > 0)
+        else if(!followUpAttackDone && attackStage < maxAttackStage && curAttackStageResetBuffer > 0)
         {
             attackStage++;
-            StartCoroutine(SwingSword(true));
         }
+    }
+
+    public void SwordSpin()
+    {
+        charCtrl.transform.Rotate(Vector3.up * spinSpeed * Mathf.Clamp(curSwordSpinDuration, 0, swordSpinDuration) * Time.deltaTime);
     }
 
     public IEnumerator ThrowBomb()
@@ -469,6 +571,7 @@ public class PlayerController : MonoBehaviour
         anim.SetInteger("CurItem", equipCtrl.curItemID);
         anim.SetBool("HighJumpReady", highJumpReady);
         anim.SetInteger("AttackStage", attackStage);
+        anim.SetFloat("SwordSpinDur", curSwordSpinDuration);
     }
 
     private void OnDrawGizmosSelected()
