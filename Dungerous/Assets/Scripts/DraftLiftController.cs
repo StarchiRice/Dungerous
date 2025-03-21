@@ -33,6 +33,7 @@ public class DraftLiftController : MonoBehaviour
         if(liftCol.Length > 0)
         {
             playerCol = liftCol[0];
+            playerCol.GetComponent<PlayerController>().draftLifted = false;
             curLingerTime = flightDuration;
             if (liftCol[0].GetComponent<PlayerController>().curSwordSpinDuration > 0)
             {
@@ -44,7 +45,7 @@ public class DraftLiftController : MonoBehaviour
         }
         else if(playerCol != null)
         {
-            playerCol.GetComponent<CharacterController>().Move(Vector3.up * -Physics.gravity.y * Mathf.Clamp(playerCol.GetComponent<PlayerController>().curSwordSpinDuration, 0, 1.1f) * Time.deltaTime);
+            playerCol.GetComponent<PlayerController>().draftLifted = true;
             curLingerTime -= Time.deltaTime;
             if(curLingerTime <= 0)
             {

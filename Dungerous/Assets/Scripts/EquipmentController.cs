@@ -19,6 +19,8 @@ public class EquipmentController : MonoBehaviour
     public float pickupRadius;
     public LayerMask whatIsPickupable;
 
+    public GameObject lastDroppedItem;
+
     //References
     public Transform itemPoint;
     private PlayerController player;
@@ -42,8 +44,12 @@ public class EquipmentController : MonoBehaviour
             if (curEquip == null)
             {
                 Collider pickupItem = Physics.OverlapSphere(pickupPoint.position, pickupRadius, whatIsPickupable)[0];
-                if(pickupItem.transform.parent == null)
+                if(pickupItem.transform.parent == null || pickupItem.transform.parent == player.follower.transform)
                 {
+                    if(pickupItem.transform.parent == player.follower.transform)
+                    {
+                        lastDroppedItem = null;
+                    }
                     EquipItem(pickupItem.GetComponent<BasicItemSolver>().itemID, lastItemPosition);
                     Destroy(pickupItem.gameObject);
                 }
@@ -84,7 +90,7 @@ public class EquipmentController : MonoBehaviour
     {
         if (curItemID != 0)
         {
-            Instantiate(curEquip.GetComponent<BasicEqupmentSolver>().dropItem, dropPosition, Quaternion.identity, null);
+            lastDroppedItem = Instantiate(curEquip.GetComponent<BasicEqupmentSolver>().dropItem, dropPosition, Quaternion.identity, null);
             Destroy(curEquip);
             curItemID = 0;
         }

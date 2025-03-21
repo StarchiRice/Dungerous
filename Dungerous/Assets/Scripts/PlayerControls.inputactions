@@ -67,6 +67,15 @@
                     "processors": "",
                     "interactions": "Hold(duration=0.2)",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "FollowerCommandReturn",
+                    "type": "Button",
+                    "id": "0dffaabb-4bd3-4458-a6a2-bed1fb54c515",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -144,6 +153,17 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "HoldUseItem",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1165d46b-569e-4106-9be0-1736d33d980e",
+                    "path": "<Gamepad>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "FollowerCommandReturn",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

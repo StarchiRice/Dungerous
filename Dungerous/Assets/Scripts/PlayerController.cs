@@ -82,9 +82,12 @@ public class PlayerController : MonoBehaviour
     public float spinSpeed;
     public float spinMoveSpeed;
 
+    public bool draftLifted;
+
     //References
     private CharacterController charCtrl;
-    private PlayerControls controls;
+    [HideInInspector]
+    public PlayerControls controls;
     public PlayerInput playerInp;
     private Animator anim;
     public GameObject model;
@@ -100,6 +103,8 @@ public class PlayerController : MonoBehaviour
     public Transform groundCheck;
     private InventoryController inventoryCtrl;
     private EquipmentController equipCtrl;
+
+    public Follower follower;
 
     private void Awake()
     {
@@ -263,6 +268,15 @@ public class PlayerController : MonoBehaviour
                 else
                 {
                     curSwordSpinDuration = 0;
+                    if (isGrounded && draftLifted)
+                    {
+                        draftLifted = false;
+                    }
+                }
+
+                if(draftLifted)
+                {
+                    DraftLiftEffected();
                 }
 
                 isMovingBall = false;
@@ -550,6 +564,11 @@ public class PlayerController : MonoBehaviour
     public void SwordSpin()
     {
         charCtrl.transform.Rotate(Vector3.up * spinSpeed * Mathf.Clamp(curSwordSpinDuration, 0, swordSpinDuration) * Time.deltaTime);
+    }
+
+    public void DraftLiftEffected()
+    {
+        charCtrl.Move(Vector3.up * -Physics.gravity.y * Mathf.Clamp(curSwordSpinDuration, 0, 1.1f) * Time.deltaTime);
     }
 
     public IEnumerator ThrowBomb()

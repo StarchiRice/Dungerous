@@ -892,7 +892,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 10
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &3561820601245442242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,6 +906,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemID: 1
+  canBeTrigger: 0
 --- !u!65 &954374155430866578
 BoxCollider:
   m_ObjectHideFlags: 0
