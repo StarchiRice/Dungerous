@@ -76,6 +76,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "FollowerCommandStandby",
+                    "type": "Button",
+                    "id": "c682aefa-88a7-4e0b-a674-812d40e107c0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -164,6 +173,17 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "FollowerCommandReturn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a1e8e70b-9cef-4e38-b94f-a6a7541a393a",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "FollowerCommandStandby",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

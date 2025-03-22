@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
@@ -81,6 +82,9 @@ public class PlayerController : MonoBehaviour
     private float curSwordSpinCooldown;
     public float spinSpeed;
     public float spinMoveSpeed;
+    public int attackOutputID;
+    public float swordSpinIDReset;
+    private float curSwordSpinIDReset;
 
     public bool draftLifted;
 
@@ -342,6 +346,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(curSwordSpinDuration <= 0)
         {
+            
             if (equipCtrl.curItemID == 1)
             {
                 equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
@@ -363,6 +368,7 @@ public class PlayerController : MonoBehaviour
 
         if (curSwordSpinDuration <= 0)
         {
+            curSwordSpinIDReset = 0;
             if (curSwordSpinCooldown > 0)
             {
                 curSwordSpinCooldown -= Time.deltaTime;
@@ -387,6 +393,12 @@ public class PlayerController : MonoBehaviour
                 equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
             }
             isAttacking = false;
+        }
+
+        //Deal damage when attacking
+        if(isAttacking)
+        {
+            DealDamage();
         }
 
         Animate();
@@ -534,6 +546,7 @@ public class PlayerController : MonoBehaviour
     {
         if (curSwingBuffer <= 0 || (followUpSwing && !followUpAttackDone))
         {
+            attackOutputID = Random.Range(1, 1000);
             if (!followUpSwing)
             {
                 curSwingBuffer = swordSwingBuffer;
@@ -563,7 +576,35 @@ public class PlayerController : MonoBehaviour
 
     public void SwordSpin()
     {
+        if (curSwordSpinIDReset <= 0)
+        {
+            curSwordSpinIDReset = swordSpinIDReset;
+            attackOutputID = Random.Range(1, 1000);
+        }
+        else
+        {
+            curSwordSpinIDReset -= Time.deltaTime;
+        }
         charCtrl.transform.Rotate(Vector3.up * spinSpeed * Mathf.Clamp(curSwordSpinDuration, 0, swordSpinDuration) * Time.deltaTime);
+    }
+
+    public void DealDamage()
+    {
+        if(equipCtrl.curItemID == 1)
+        {
+            Collider[] dmgCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit);
+            if(dmgCol.Length > 0)
+            {
+                for (int i = 0; i < dmgCol.Length; i++)
+                {
+                    if (dmgCol[i].GetComponent<EnemyHealth>().lastHitID != attackOutputID)
+                    {
+                        dmgCol[i].GetComponent<EnemyHealth>().TakeDamage(2, 1, (dmgCol[i].transform.position - transform.position).normalized, attackOutputID, transform);
+                        Debug.Log("Dealt DAMAGE");
+                    }
+                }
+            }
+        }
     }
 
     public void DraftLiftEffected()

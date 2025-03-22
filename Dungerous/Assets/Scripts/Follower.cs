@@ -17,16 +17,19 @@ public class Follower : MonoBehaviour
     public GameObject pickedUpObj;
     public bool isPickingUp;
     public bool isReturning;
+    public bool isStandby;
     public Vector3 itemDropDestinationOffset;
 
     //References
     private PlayerController player;
+    private TrailRenderer trail;
 
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         player.follower = this;
+        trail = GetComponentInChildren<TrailRenderer>();
     }
 
     // Update is called once per frame
@@ -51,13 +54,18 @@ public class Follower : MonoBehaviour
         }
         else
         {
+            if(isPickingUp && followTarget == null)
+            {
+                isPickingUp = false;
+            }
             Pickup();
         }
     }
 
     void Follow()
     {
-        if(player.isRolling)
+        trail.emitting = true;
+        if (player.isRolling)
         {
             followTarget = player.ballTrans;
             followDistance = ballFollowDistance;
@@ -87,6 +95,7 @@ public class Follower : MonoBehaviour
         //Move to pickup dropped item
         if (pickedUpObj.transform.parent != transform)
         {
+            trail.emitting = true;
             if (Vector3.Distance(transform.position, pickedUpObj.transform.position) > 0.25f)
             {
                 transform.position = Vector3.Slerp(transform.position, pickedUpObj.transform.position, followSpeed * Time.deltaTime);
@@ -99,11 +108,18 @@ public class Follower : MonoBehaviour
         else if (player.controls.Gameplay.FollowerCommandReturn.WasPerformedThisFrame())
         {
             //Initialize returning item to inventory when commanded
-            isReturning = true;
+            isReturning = !isReturning;
+            isStandby = false;
         }
-        else if(!isReturning)
+        else if (player.controls.Gameplay.FollowerCommandStandby.WasPerformedThisFrame())
+        {
+            isStandby = !isStandby;
+            isReturning = false;
+        }
+        else if(!isReturning && !isStandby)
         {
             //Float above player while holding item
+            trail.emitting = true;
             if (player.isRolling)
             {
                 followTarget = player.ballTrans;
@@ -126,19 +142,33 @@ public class Follower : MonoBehaviour
         }
         if (isReturning)
         {
+            trail.emitting = true;
             if (Vector3.Distance(transform.position, player.ballTrans.transform.position + itemDropDestinationOffset) > 1)
             {
                 transform.position = Vector3.Slerp(transform.position, player.ballTrans.transform.position + itemDropDestinationOffset, followSpeed / 1.5f * Time.deltaTime);
             }
             else
             {
+                pickedUpObj.transform.parent = null;
                 if (player.GetComponent<EquipmentController>().lastDroppedItem == pickedUpObj)
                 {
                     player.GetComponent<EquipmentController>().lastDroppedItem = null;
                 }
-                pickedUpObj.transform.parent = null;
                 pickedUpObj = null;
                 isReturning = false;
+            }
+        }
+        else if(isStandby)
+        {
+            if (Vector3.Distance(transform.position, player.cam.followerStandbyPoint.position) > 1)
+            {
+                trail.emitting = true;
+                transform.position = Vector3.Slerp(transform.position, player.cam.followerStandbyPoint.position, followSpeed * 3 * Time.deltaTime);
+            }
+            else
+            {
+                trail.emitting = false;
+                transform.position = player.cam.followerStandbyPoint.position;
             }
         }
     }

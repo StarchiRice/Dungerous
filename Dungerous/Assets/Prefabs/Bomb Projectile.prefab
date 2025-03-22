@@ -179,12 +179,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61c571520a0c1fb469f5064838371406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionForce: 10
+  explosionDamage: 10
   fuseTime: 3
   explodeRadius: 2.75
   whatCanExplode:
     serializedVersion: 2
-    m_Bits: 8192
+    m_Bits: 24576
   explosionEffect: {fileID: 7460408385126087319, guid: d174cebfc1b74864e8e704bfe7407987,
     type: 3}
 --- !u!1 &2773236434876509380

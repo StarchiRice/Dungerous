@@ -98,6 +98,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FollowerCommandStandby"",
+                    ""type"": ""Button"",
+                    ""id"": ""c682aefa-88a7-4e0b-a674-812d40e107c0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -188,6 +197,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""FollowerCommandReturn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a1e8e70b-9cef-4e38-b94f-a6a7541a393a"",
+                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""FollowerCommandStandby"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -216,6 +236,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_UseItem = m_Gameplay.FindAction("UseItem", throwIfNotFound: true);
         m_Gameplay_HoldUseItem = m_Gameplay.FindAction("HoldUseItem", throwIfNotFound: true);
         m_Gameplay_FollowerCommandReturn = m_Gameplay.FindAction("FollowerCommandReturn", throwIfNotFound: true);
+        m_Gameplay_FollowerCommandStandby = m_Gameplay.FindAction("FollowerCommandStandby", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -285,6 +306,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_UseItem;
     private readonly InputAction m_Gameplay_HoldUseItem;
     private readonly InputAction m_Gameplay_FollowerCommandReturn;
+    private readonly InputAction m_Gameplay_FollowerCommandStandby;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -297,6 +319,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @UseItem => m_Wrapper.m_Gameplay_UseItem;
         public InputAction @HoldUseItem => m_Wrapper.m_Gameplay_HoldUseItem;
         public InputAction @FollowerCommandReturn => m_Wrapper.m_Gameplay_FollowerCommandReturn;
+        public InputAction @FollowerCommandStandby => m_Wrapper.m_Gameplay_FollowerCommandStandby;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -330,6 +353,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @FollowerCommandReturn.started += instance.OnFollowerCommandReturn;
             @FollowerCommandReturn.performed += instance.OnFollowerCommandReturn;
             @FollowerCommandReturn.canceled += instance.OnFollowerCommandReturn;
+            @FollowerCommandStandby.started += instance.OnFollowerCommandStandby;
+            @FollowerCommandStandby.performed += instance.OnFollowerCommandStandby;
+            @FollowerCommandStandby.canceled += instance.OnFollowerCommandStandby;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -358,6 +384,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @FollowerCommandReturn.started -= instance.OnFollowerCommandReturn;
             @FollowerCommandReturn.performed -= instance.OnFollowerCommandReturn;
             @FollowerCommandReturn.canceled -= instance.OnFollowerCommandReturn;
+            @FollowerCommandStandby.started -= instance.OnFollowerCommandStandby;
+            @FollowerCommandStandby.performed -= instance.OnFollowerCommandStandby;
+            @FollowerCommandStandby.canceled -= instance.OnFollowerCommandStandby;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -394,5 +423,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnUseItem(InputAction.CallbackContext context);
         void OnHoldUseItem(InputAction.CallbackContext context);
         void OnFollowerCommandReturn(InputAction.CallbackContext context);
+        void OnFollowerCommandStandby(InputAction.CallbackContext context);
     }
 }

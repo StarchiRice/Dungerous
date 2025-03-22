@@ -5,7 +5,7 @@ using UnityEngine;
 public class BombController : MonoBehaviour
 {
     //Variables
-    public float explosionForce;
+    public float explosionDamage;
     public float fuseTime;
     private float curFuseTime;
 
@@ -40,7 +40,14 @@ public class BombController : MonoBehaviour
         Collider[] affectCol = Physics.OverlapSphere(transform.position, explodeRadius, whatCanExplode);
         for (int i = 0; i < affectCol.Length; i++)
         {
-            Destroy(affectCol[i].gameObject);
+            if(affectCol[i].GetComponent<EnemyHealth>() != null)
+            {
+                affectCol[i].GetComponent<EnemyHealth>().TakeDamage(explosionDamage, 1.5f, (affectCol[i].transform.position - transform.position).normalized, Random.Range(1, 1000), transform);
+            }
+            else
+            {
+                Destroy(affectCol[i].gameObject);
+            }
         }
         Destroy(gameObject);
     }

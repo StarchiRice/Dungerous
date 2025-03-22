@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour
     public Transform target;
     public Transform pivot;
     public Transform obstructCheck;
+    public Transform followerStandbyPoint;
 
     public float freeCamSpeed;
 

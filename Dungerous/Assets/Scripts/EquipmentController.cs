@@ -44,7 +44,7 @@ public class EquipmentController : MonoBehaviour
             if (curEquip == null)
             {
                 Collider pickupItem = Physics.OverlapSphere(pickupPoint.position, pickupRadius, whatIsPickupable)[0];
-                if(pickupItem.transform.parent == null || pickupItem.transform.parent == player.follower.transform)
+                if(pickupItem.transform.parent == null || (pickupItem.transform.parent == player.follower.transform && !player.follower.isStandby && !player.follower.isReturning))
                 {
                     if(pickupItem.transform.parent == player.follower.transform)
                     {
