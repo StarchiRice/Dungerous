@@ -14,6 +14,10 @@ public class Follower : MonoBehaviour
     public Vector3 followOffset;
     private Transform followTarget;
 
+    public Vector3 lookTarget;
+    private Vector3 modelAngleDest;
+    public float modelRotateSpeed;
+
     public GameObject pickedUpObj;
     public bool isPickingUp;
     public bool isReturning;
@@ -22,14 +26,14 @@ public class Follower : MonoBehaviour
 
     //References
     private PlayerController player;
-    private TrailRenderer trail;
+    public TrailRenderer trail;
+    public GameObject model;
 
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         player.follower = this;
-        trail = GetComponentInChildren<TrailRenderer>();
     }
 
     // Update is called once per frame
@@ -75,15 +79,19 @@ public class Follower : MonoBehaviour
             followTarget = player.transform;
             followDistance = playerFollowDistance;
         }
-
-        if(Vector3.Distance(transform.position, followTarget.transform.position + followOffset) > followDistance)
+        lookTarget = followTarget.position + followOffset;
+        if (Vector3.Distance(transform.position, followTarget.transform.position + followOffset) > followDistance)
         {
             transform.position = Vector3.Slerp(transform.position, followTarget.transform.position + followOffset, followSpeed * Time.deltaTime);
+            modelAngleDest = Vector3.zero;
         }
         else
         {
             transform.RotateAround(followTarget.transform.position + followOffset, transform.up, 90 * Time.deltaTime);
+            modelAngleDest = new Vector3(0, -90, 0);
         }
+        transform.LookAt(lookTarget, Vector3.up);
+        model.transform.localEulerAngles = modelAngleDest;
     }
 
     void Pickup()
@@ -95,6 +103,8 @@ public class Follower : MonoBehaviour
         //Move to pickup dropped item
         if (pickedUpObj.transform.parent != transform)
         {
+            lookTarget = pickedUpObj.transform.position;
+            modelAngleDest = Vector3.zero;
             trail.emitting = true;
             if (Vector3.Distance(transform.position, pickedUpObj.transform.position) > 0.25f)
             {
@@ -130,18 +140,22 @@ public class Follower : MonoBehaviour
                 followTarget = player.transform;
                 followDistance = playerFollowDistance;
             }
-
+            lookTarget = followTarget.position + followOffset;
             if (Vector3.Distance(transform.position, followTarget.transform.position + followOffset) > followDistance)
             {
                 transform.position = Vector3.Slerp(transform.position, followTarget.transform.position + followOffset, followSpeed * Time.deltaTime);
+                modelAngleDest = Vector3.zero;
             }
             else
             {
                 transform.RotateAround(followTarget.transform.position + followOffset, transform.up, 90 * Time.deltaTime);
+                modelAngleDest = new Vector3(0, -90, 0);
             }
         }
         if (isReturning)
         {
+            lookTarget = player.ballTrans.position;
+            modelAngleDest = Vector3.zero;
             trail.emitting = true;
             if (Vector3.Distance(transform.position, player.ballTrans.transform.position + itemDropDestinationOffset) > 1)
             {
@@ -160,6 +174,8 @@ public class Follower : MonoBehaviour
         }
         else if(isStandby)
         {
+            lookTarget = player.cam.followerStandbyPoint.position;
+            modelAngleDest = Vector3.zero;
             if (Vector3.Distance(transform.position, player.cam.followerStandbyPoint.position) > 1)
             {
                 trail.emitting = true;
@@ -171,5 +187,7 @@ public class Follower : MonoBehaviour
                 transform.position = player.cam.followerStandbyPoint.position;
             }
         }
+        transform.LookAt(lookTarget, Vector3.up);
+        model.transform.localEulerAngles = modelAngleDest;
     }
 }
