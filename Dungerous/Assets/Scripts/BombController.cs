@@ -42,7 +42,7 @@ public class BombController : MonoBehaviour
         {
             if(affectCol[i].GetComponent<EnemyHealth>() != null)
             {
-                affectCol[i].GetComponent<EnemyHealth>().TakeDamage(explosionDamage, 1.5f, (affectCol[i].transform.position - transform.position).normalized, Random.Range(1, 1000), transform);
+                affectCol[i].GetComponent<EnemyHealth>().TakeDamage(explosionDamage, 1.5f, (affectCol[i].transform.position - transform.position).normalized, Random.Range(1, 1000), transform.position);
             }
             else
             {

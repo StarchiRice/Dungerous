@@ -274,7 +274,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemID: 2
-  canBeTrigger: 0
 --- !u!65 &954374155430866578
 BoxCollider:
   m_ObjectHideFlags: 0

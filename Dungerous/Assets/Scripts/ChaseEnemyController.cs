@@ -85,7 +85,7 @@ public class ChaseEnemyController : MonoBehaviour
         {
             if (healthCtrl.lastHitOrigin != null)
             {
-                Vector3 hitOriginVector = (healthCtrl.lastHitOrigin.position - transform.position).normalized;
+                Vector3 hitOriginVector = (healthCtrl.lastHitOrigin - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(hitOriginVector.x, 0, hitOriginVector.z)), rotateSpeed * Time.deltaTime);
             }
         }
@@ -103,7 +103,10 @@ public class ChaseEnemyController : MonoBehaviour
             //When at min chase distance
             Idle();
         }
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(chaseDir.x, 0, chaseDir.z)), rotateSpeed * Time.deltaTime);
+        if (healthCtrl.curHitStun <= 0)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(chaseDir.x, 0, chaseDir.z)), rotateSpeed * Time.deltaTime);
+        }
     }
 
     public void Idle()

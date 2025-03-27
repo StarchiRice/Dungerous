@@ -88,6 +88,14 @@ public class PlayerController : MonoBehaviour
 
     public bool draftLifted;
 
+    public float hammerSwingBuffer;
+    public bool hammerAirDrop;
+    public int hammerSlamStage, maxSlamStage, storedSlamStage;
+    private float curHammerStageUpTime;
+    public float hammerStageUpTime;
+    private float curHammerSlamAnimTime;
+    public float hammerSlamAnimTime;
+
     //References
     private CharacterController charCtrl;
     [HideInInspector]
@@ -337,7 +345,7 @@ public class PlayerController : MonoBehaviour
 
         if (curAttackStageResetBuffer > 0)
         {
-            if (equipCtrl.curItemID == 1)
+            if (equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
             {
                 equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
             }
@@ -347,7 +355,7 @@ public class PlayerController : MonoBehaviour
         else if(curSwordSpinDuration <= 0)
         {
             
-            if (equipCtrl.curItemID == 1)
+            if (equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
             {
                 equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
             }
@@ -393,6 +401,46 @@ public class PlayerController : MonoBehaviour
                 equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
             }
             isAttacking = false;
+        }
+
+        //Manage Hammer Air Drop
+        if(equipCtrl.curItemID == 4)
+        {
+            if(isGrounded)
+            {
+                curHammerStageUpTime = hammerStageUpTime;
+            }
+            if(curHammerSlamAnimTime > 0)
+            {
+                curHammerSlamAnimTime -= Time.deltaTime;
+            }
+            else
+            {
+                curHammerSlamAnimTime = 0;
+            }
+
+            if(hammerAirDrop)
+            {
+                if (!isGrounded)
+                {
+                    if (curHammerStageUpTime < 0)
+                    {
+                        curHammerStageUpTime = hammerStageUpTime;
+                        if (hammerSlamStage < maxSlamStage)
+                        {
+                            hammerSlamStage++;
+                        }
+                    }
+                    else
+                    {
+                        curHammerStageUpTime -= Time.deltaTime;
+                    }
+                }
+                else
+                {
+                    HammerSlam(true);
+                }
+            }
         }
 
         //Deal damage when attacking
@@ -588,9 +636,63 @@ public class PlayerController : MonoBehaviour
         charCtrl.transform.Rotate(Vector3.up * spinSpeed * Mathf.Clamp(curSwordSpinDuration, 0, swordSpinDuration) * Time.deltaTime);
     }
 
+    public void HammerSlam(bool bypass)
+    {
+        if (curSwingBuffer <= 0 || bypass)
+        {
+            curSwingBuffer = hammerSwingBuffer;
+            if (isGrounded)
+            {
+                curHammerStageUpTime = hammerStageUpTime;
+                if (hammerSlamStage <= 0)
+                {
+                    hammerSlamStage = 1;
+                }
+                curHammerSlamAnimTime = hammerSlamAnimTime;
+                if (hammerAirDrop == false)
+                {
+                    anim.SetTrigger("SlamHammer");
+                }
+                else
+                {
+                    anim.SetTrigger("AirSlamHammer");
+                }
+                Debug.Log("Performed HAMMER SLAM Stage " + hammerSlamStage);
+                storedSlamStage = hammerSlamStage;
+                hammerSlamStage = 0;
+                hammerAirDrop = false;
+                curHammerStageUpTime = 0;
+            }
+            else if(hammerAirDrop == false)
+            {
+                hammerSlamStage = 0;
+                curHammerStageUpTime = hammerStageUpTime;
+                hammerAirDrop = true;
+            }
+        }
+    }
+
+    public void SlamJump()
+    {
+        if (isGrounded)
+        {
+            anim.SetTrigger("Jump");
+            if (storedSlamStage == 1)
+            {
+                jumpTime = 0.35f * storedSlamStage;
+            }
+            else
+            {
+                jumpTime = 0.3f * storedSlamStage;
+            }
+            jumpTimeCutMod = 0;
+        }
+        storedSlamStage = 0;
+    }
+
     public void DealDamage()
     {
-        if(equipCtrl.curItemID == 1)
+        if(equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
         {
             Collider[] dmgCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit);
             if(dmgCol.Length > 0)
@@ -599,7 +701,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if (dmgCol[i].GetComponent<EnemyHealth>().lastHitID != attackOutputID)
                     {
-                        dmgCol[i].GetComponent<EnemyHealth>().TakeDamage(2, 1, (dmgCol[i].transform.position - transform.position).normalized, attackOutputID, transform);
+                        dmgCol[i].GetComponent<EnemyHealth>().TakeDamage(2, 1, (dmgCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
                         Debug.Log("Dealt DAMAGE");
                     }
                 }
@@ -632,6 +734,8 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("HighJumpReady", highJumpReady);
         anim.SetInteger("AttackStage", attackStage);
         anim.SetFloat("SwordSpinDur", curSwordSpinDuration);
+        anim.SetBool("HammerAirDrop", hammerAirDrop);
+        anim.SetFloat("HammerSlamTime", curHammerSlamAnimTime);
     }
 
     private void OnDrawGizmosSelected()

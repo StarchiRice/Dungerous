@@ -91,7 +91,7 @@ public class Follower : MonoBehaviour
             modelAngleDest = new Vector3(0, -90, 0);
         }
         transform.LookAt(lookTarget, Vector3.up);
-        model.transform.localEulerAngles = modelAngleDest;
+        model.transform.localEulerAngles = new Vector3(0, Mathf.MoveTowardsAngle(model.transform.localEulerAngles.y, modelAngleDest.y, modelRotateSpeed * Time.deltaTime), 0);
     }
 
     void Pickup()
@@ -118,11 +118,13 @@ public class Follower : MonoBehaviour
         else if (player.controls.Gameplay.FollowerCommandReturn.WasPerformedThisFrame())
         {
             //Initialize returning item to inventory when commanded
+            transform.parent = null;
             isReturning = !isReturning;
             isStandby = false;
         }
         else if (player.controls.Gameplay.FollowerCommandStandby.WasPerformedThisFrame())
         {
+            transform.parent = null;
             isStandby = !isStandby;
             isReturning = false;
         }
@@ -176,18 +178,24 @@ public class Follower : MonoBehaviour
         {
             lookTarget = player.cam.followerStandbyPoint.position;
             modelAngleDest = Vector3.zero;
-            if (Vector3.Distance(transform.position, player.cam.followerStandbyPoint.position) > 1)
+            if (Vector3.Distance(transform.position, player.cam.followerStandbyPoint.position) > 2)
             {
+                transform.LookAt(lookTarget, Vector3.up);
                 trail.emitting = true;
                 transform.position = Vector3.Slerp(transform.position, player.cam.followerStandbyPoint.position, followSpeed * 3 * Time.deltaTime);
             }
             else
             {
+                transform.Rotate(Vector3.up, 60 * Time.deltaTime);
                 trail.emitting = false;
-                transform.position = player.cam.followerStandbyPoint.position;
+                transform.parent = player.cam.followerStandbyPoint;
+                transform.localPosition = Vector3.zero;
             }
         }
-        transform.LookAt(lookTarget, Vector3.up);
-        model.transform.localEulerAngles = modelAngleDest;
+        if (!isStandby)
+        {
+            transform.LookAt(lookTarget, Vector3.up);
+        }
+        model.transform.localEulerAngles = new Vector3(0, Mathf.MoveTowardsAngle(model.transform.localEulerAngles.y, modelAngleDest.y, modelRotateSpeed * Time.deltaTime), 0);
     }
 }

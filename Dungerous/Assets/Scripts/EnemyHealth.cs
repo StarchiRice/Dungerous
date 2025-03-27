@@ -9,7 +9,7 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth, curHealth, curHitStun;
     public Vector3 curHitDir;
     public int lastHitID;
-    public Transform lastHitOrigin;
+    public Vector3 lastHitOrigin;
     public float curKnockbackFalloff;
     public float knockbackFalloff;
 
@@ -53,7 +53,7 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float dmgTaken, float hitStun, Vector3 hitDir, int hitID, Transform hitOrigin)
+    public void TakeDamage(float dmgTaken, float hitStun, Vector3 hitDir, int hitID, Vector3 hitOrigin)
     {
         if (curHealth > 0)
         {
@@ -68,7 +68,7 @@ public class EnemyHealth : MonoBehaviour
 
     public void Die()
     {
-        transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.zero, 5 * Time.deltaTime);
+        transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.zero, 7 * Time.deltaTime);
         if (transform.localScale.magnitude <= 0.3f)
         {
             Destroy(gameObject);

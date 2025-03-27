@@ -64,7 +64,7 @@ public class EquipmentController : MonoBehaviour
             //Shove
             player.Shove();
         }
-        else if (curItemID == 1)
+        else if (curItemID == 1 || curItemID == 3)
         {
             //Swing Sword
             player.SwingSword(false);
@@ -73,6 +73,10 @@ public class EquipmentController : MonoBehaviour
         {
             //Throw Bomb
             player.StartCoroutine(player.ThrowBomb());
+        }
+        else if(curItemID == 4)
+        {
+            player.HammerSlam(false);
         }
     }
 

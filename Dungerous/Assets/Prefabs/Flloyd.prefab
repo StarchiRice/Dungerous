@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1742674568109207941}
   - component: {fileID: 4183527000532090782}
   - component: {fileID: 2721376488079672241}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Flloyd
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,7 +51,7 @@ MonoBehaviour:
   playerFollowDistance: 2
   followOffset: {x: 0, y: 3, z: 0}
   lookTarget: {x: 0, y: 0, z: 0}
-  modelRotateSpeed: 130
+  modelRotateSpeed: 300
   pickedUpObj: {fileID: 0}
   isPickingUp: 0
   isReturning: 0
@@ -90,7 +90,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3469493617879375600}
   - component: {fileID: 4792532852824060782}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -234,7 +234,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7331586230234263974}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,10 +320,80 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: -8123601854136504163, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: -7129138933855392635, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: -4553856283323204927, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: -3781766626711259161, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: -1070480921695001527, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 32522271119291160, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 909831341444427759, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d04d20ceea9244a4bba2b5067d273131,
         type: 3}
       propertyPath: m_Name
       value: Flloyd
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4278117141638303132, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5019639260402858754, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7036213049465896255, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7448514765247876191, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8298377369320527268, guid: d04d20ceea9244a4bba2b5067d273131,
+        type: 3}
+      propertyPath: m_Layer
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
