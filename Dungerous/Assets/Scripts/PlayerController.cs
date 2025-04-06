@@ -33,6 +33,9 @@ public class PlayerController : MonoBehaviour
     private float highJumpBuffer;
     public int highJumpLimit;
 
+    public float hangTimeGravityMod;
+    public float hangTimeRateChange;
+
     public float groundCheckRadius;
     public bool isGrounded;
     public LayerMask whatIsGround;
@@ -194,6 +197,7 @@ public class PlayerController : MonoBehaviour
                         //Initialize the jump
                         if (controls.Gameplay.Jump.WasPressedThisFrame())
                         {
+                            draftLifted = false;
                             anim.SetTrigger("Jump");
                             jumpTime = maxJumpTime;
                             jumpTimeCutMod = 0;
@@ -342,65 +346,62 @@ public class PlayerController : MonoBehaviour
         }
 
         //Manage Follow Up Sword Swing/Sword Spin
+        if (equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
+        {
+            if (curAttackStageResetBuffer > 0)
+            {
+                curAttackStageResetBuffer -= Time.deltaTime;
+            }
+            else if (curSwordSpinDuration <= 0)
+            {
 
-        if (curAttackStageResetBuffer > 0)
-        {
-            if (equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
-            {
-                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
-            }
-            isAttacking = true;
-            curAttackStageResetBuffer -= Time.deltaTime;
-        }
-        else if(curSwordSpinDuration <= 0)
-        {
-            
-            if (equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
-            {
-                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
-            }
-            isAttacking = false;
-            if (attackStage > 1)
-            {
-                if (followUpAttackDone == false)
+                if (equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
                 {
-                    SwingSword(true);
-                    followUpAttackDone = true;
+                    equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
+                }
+                isAttacking = false;
+                if (attackStage > 1)
+                {
+                    if (followUpAttackDone == false)
+                    {
+                        SwingSword(true);
+                        followUpAttackDone = true;
+                    }
+                }
+                else
+                {
+                    attackStage = 0;
                 }
             }
-            else
-            {
-                attackStage = 0;
-            }
-        }
 
-        if (curSwordSpinDuration <= 0)
-        {
-            curSwordSpinIDReset = 0;
-            if (curSwordSpinCooldown > 0)
+            if (curSwordSpinDuration <= 0)
             {
-                curSwordSpinCooldown -= Time.deltaTime;
+                curSwordSpinIDReset = 0;
+                if (curSwordSpinCooldown > 0)
+                {
+                    curSwordSpinCooldown -= Time.deltaTime;
+                }
+                else
+                {
+                    curSwordSpinCooldown = 0;
+                }
+            }
+            else if (curSwordSpinDuration > 0.3f)
+            {
+                if (equipCtrl.curItemID == 1)
+                {
+                    equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
+                }
+                isAttacking = true;
             }
             else
             {
-                curSwordSpinCooldown = 0;
+                if (equipCtrl.curItemID == 1)
+                {
+                    equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
+                }
+                isAttacking = false;
             }
-        }
-        else if(curSwordSpinDuration > 0.3f)
-        {
-            if (equipCtrl.curItemID == 1)
-            {
-                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
-            }
-            isAttacking = true;
-        }
-        else
-        {
-            if (equipCtrl.curItemID == 1)
-            {
-                equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
-            }
-            isAttacking = false;
         }
 
         //Manage Hammer Air Drop
@@ -466,7 +467,17 @@ public class PlayerController : MonoBehaviour
         {
             moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
         }
-        charCtrl.Move((Vector3.up * Physics.gravity.y) * Time.deltaTime);
+
+        if (jumpTime <= 0 && shoveHighJumpTime <= 0 && wallShoveTime <= 0 && !isGrounded)
+        {
+            hangTimeGravityMod = Mathf.Lerp(hangTimeGravityMod, 1, hangTimeRateChange * Time.deltaTime);
+            charCtrl.Move((Vector3.up * Physics.gravity.y * hangTimeGravityMod) * Time.deltaTime);
+        }
+        else if(jumpTime <= 0 && shoveHighJumpTime <= 0 && wallShoveTime <= 0 && isGrounded)
+        {
+            charCtrl.Move((Vector3.up * Physics.gravity.y) * Time.deltaTime);
+            hangTimeGravityMod = 0;
+        }
         if(isGrounded == true && highJumpReady)
         {
             charCtrl.Move(Vector3.zero);
@@ -540,7 +551,30 @@ public class PlayerController : MonoBehaviour
         ballLogic.BallRide();
         transform.position = Vector3.Lerp(transform.position, ballLogic.ballRidePoint.position, rideModeFollowSpeed * Time.deltaTime);
 
-        ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), ballRideAcceleration * Time.deltaTime));
+        if (ballLogic.isGrounded)
+        {
+            if (ballLogic.rb.velocity.y < -7)
+            {
+                ballLogic.slopePowerTime += 1 * Time.deltaTime;
+                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 10 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 10, moveDirection.normalized.z * rideMoveSpeed * 10 * Time.fixedDeltaTime), ballRideAcceleration * 8 * Time.deltaTime));
+            }
+            else if(ballLogic.slopePowered)
+            {
+                ballLogic.slopePowerTime -= Time.deltaTime;
+                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 7 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 7, moveDirection.normalized.z * rideMoveSpeed * 7 * Time.fixedDeltaTime), ballRideAcceleration * 8 * Time.deltaTime));
+            }
+            else
+            {
+                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), ballRideAcceleration * Time.deltaTime));
+            }
+        }
+        else
+        {
+            if(ballLogic.slopePowered)
+            {
+                ballLogic.slopePowerTime -= Time.deltaTime;
+            }
+        }
         if (moveDirection != Vector3.zero)
         {
             isMoving = true;
@@ -558,14 +592,22 @@ public class PlayerController : MonoBehaviour
     {
         if (shoveCooldownTime <= 0)
         {
+            attackOutputID = Random.Range(1, 1000);
             anim.SetTrigger("Shove");
             shoveCooldownTime = startShoveCooldownTime;
             if (Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShove))
             {
-                Collider shoveCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShove)[0];
-                if (shoveCol.GetComponent<Rigidbody>())
+                Collider[] shoveCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShove);
+                for (int i = 0; i < shoveCol.Length; i++)
                 {
-                    shoveCol.GetComponent<Rigidbody>().velocity += ((shoveCol.transform.position - transform.position) * shoveForce / shoveCol.GetComponent<Rigidbody>().mass);
+                    if (shoveCol[i].GetComponent<Rigidbody>())
+                    {
+                        shoveCol[i].GetComponent<Rigidbody>().velocity += ((shoveCol[i].transform.position - transform.position) * shoveForce / shoveCol[i].GetComponent<Rigidbody>().mass);
+                    }
+                    if (shoveCol[i].GetComponent<EnemyHealth>())
+                    {
+                        shoveCol[i].GetComponent<EnemyHealth>().TakeDamage(0, 1, (shoveCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
+                    }
                 }
             }
             else if(Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShoveOff))
@@ -582,7 +624,8 @@ public class PlayerController : MonoBehaviour
 
     public void WallShove()
     {
-        charCtrl.Move(transform.TransformDirection(new Vector3(0, 1.35f, -0.5f)) * wallShoveForce * wallShoveTime * Time.deltaTime);
+        hangTimeGravityMod = 0;
+        charCtrl.Move(transform.TransformDirection(new Vector3(0, 1.2f, -1.2f)) * wallShoveForce * wallShoveTime * Time.deltaTime);
     }
 
     public void ShoveHighJump()
@@ -636,6 +679,33 @@ public class PlayerController : MonoBehaviour
         charCtrl.transform.Rotate(Vector3.up * spinSpeed * Mathf.Clamp(curSwordSpinDuration, 0, swordSpinDuration) * Time.deltaTime);
     }
 
+    public void SwordAttacking(int isAttackState)
+    {
+        if(isAttackState == 1)
+        {
+            isAttacking = true;
+            equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = true;
+        }
+        else if(isAttackState == 0)
+        {
+            isAttacking = false;
+            equipCtrl.curEquip.GetComponentInChildren<TrailRenderer>().emitting = false;
+        }
+    }
+
+    public void HammerAttacking(int isAttackState)
+    {
+        if (isAttackState == 1)
+        {
+            attackOutputID = Random.Range(1, 1000);
+            isAttacking = true;
+        }
+        else if (isAttackState == 0)
+        {
+            isAttacking = false;
+        }
+    }
+
     public void HammerSlam(bool bypass)
     {
         if (curSwingBuffer <= 0 || bypass)
@@ -679,7 +749,7 @@ public class PlayerController : MonoBehaviour
             anim.SetTrigger("Jump");
             if (storedSlamStage == 1)
             {
-                jumpTime = 0.35f * storedSlamStage;
+                jumpTime = 0.4f * storedSlamStage;
             }
             else
             {
@@ -692,7 +762,7 @@ public class PlayerController : MonoBehaviour
 
     public void DealDamage()
     {
-        if(equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3)
+        if(equipCtrl.curItemID == 1 || equipCtrl.curItemID == 3 || equipCtrl.curItemID == 4)
         {
             Collider[] dmgCol = Physics.OverlapSphere(swordHitBoxPoint.position, swordHitBoxRadius, whatCanSwordHit);
             if(dmgCol.Length > 0)
@@ -711,7 +781,7 @@ public class PlayerController : MonoBehaviour
 
     public void DraftLiftEffected()
     {
-        charCtrl.Move(Vector3.up * -Physics.gravity.y * Mathf.Clamp(curSwordSpinDuration, 0, 1.1f) * Time.deltaTime);
+        charCtrl.Move(Vector3.up * -Physics.gravity.y * Mathf.Clamp(curSwordSpinDuration, 0, 1.15f) * Time.deltaTime);
     }
 
     public IEnumerator ThrowBomb()

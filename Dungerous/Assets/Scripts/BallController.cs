@@ -16,6 +16,16 @@ public class BallController : MonoBehaviour
     public float rideCheckRadius;
     public LayerMask whatCanRide;
 
+    public bool isGrounded;
+    public Transform groundCheck;
+    public float groundCheckRadius;
+    public LayerMask whatIsGround;
+
+    public Vector3 freeRolVel;
+
+    public bool slopePowered;
+    public float slopePowerTime;
+
     //References
     public GameObject ballModel;
     private CharacterController ctrl;
@@ -31,6 +41,15 @@ public class BallController : MonoBehaviour
 
     private void Update()
     {
+        if (Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround))
+        {
+            isGrounded = true;
+        }
+        else
+        {
+            isGrounded = false;
+        }
+
         if (ctrl.velocity.x != 0 || ctrl.velocity.z != 0)
         {
             ctrl.transform.rotation = Quaternion.LookRotation(new Vector3(ctrl.velocity.x, 0, ctrl.velocity.z));
@@ -73,6 +92,16 @@ public class BallController : MonoBehaviour
             float dist = rb.velocity.magnitude * Time.deltaTime;
             float alpha = (dist * 180.0f) / (Mathf.PI * 0.37f);
             ballModel.transform.Rotate(ballRightDir, alpha * rollSpeedModifier, Space.World);
+            freeRolVel = rb.velocity;
+            if(slopePowerTime > 0)
+            {
+                slopePowered = true;
+            }
+            else
+            {
+                slopePowered = false;
+                slopePowerTime = 0;
+            }
         }
     }
 
@@ -83,7 +112,10 @@ public class BallController : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(ballRideCheck.position, rideCheckRadius);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }

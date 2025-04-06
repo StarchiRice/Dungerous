@@ -409,7 +409,23 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.23853211
+        functionName: SwordAttacking
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: 1
+        messageOptions: 0
+      - time: 0.8351766
+        functionName: SwordAttacking
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
@@ -554,7 +570,23 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.12232416
+        functionName: SwordAttacking
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: 1
+        messageOptions: 0
+      - time: 0.8685015
+        functionName: SwordAttacking
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
@@ -700,8 +732,24 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
+      - time: 0.122324154
+        functionName: HammerAttacking
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: 1
+        messageOptions: 0
       - time: 0.2899543
         functionName: SlamJump
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.565456
+        functionName: HammerAttacking
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
           type: 3}

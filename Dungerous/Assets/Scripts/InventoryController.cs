@@ -24,10 +24,15 @@ public class InventoryController : MonoBehaviour
     public EquipmentController equipCtrl;
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        player.ballTrans = transform;
+    }
+
     void Start()
     {
         inventoryCam.transform.parent = null;
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         equipCtrl = player.GetComponent<EquipmentController>();
     }
 

@@ -33,23 +33,27 @@ public class DraftLiftController : MonoBehaviour
         if(liftCol.Length > 0)
         {
             playerCol = liftCol[0];
-            playerCol.GetComponent<PlayerController>().draftLifted = false;
-            curLingerTime = flightDuration;
+            playerCol.GetComponent<PlayerController>().draftLifted = true;
             if (liftCol[0].GetComponent<PlayerController>().curSwordSpinDuration > 0)
             {
-                
-                    liftCol[0].GetComponent<CharacterController>().Move(Vector3.up * liftSpeed * Time.deltaTime);
-                
+                curLingerTime = flightDuration;
                 liftCol[0].GetComponent<PlayerController>().curSwordSpinDuration = flightDuration;
+            }
+            else
+            {
+                curLingerTime = 0;
             }
         }
         else if(playerCol != null)
         {
-            playerCol.GetComponent<PlayerController>().draftLifted = true;
             curLingerTime -= Time.deltaTime;
             if(curLingerTime <= 0)
             {
                 playerCol = null;
+            }
+            else if(playerCol.GetComponent<PlayerController>().isGrounded && playerCol.GetComponent<PlayerController>().draftLifted == true)
+            {
+                curLingerTime = 0;
             }
         }
     }

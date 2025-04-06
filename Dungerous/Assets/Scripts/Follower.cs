@@ -131,6 +131,7 @@ public class Follower : MonoBehaviour
         else if(!isReturning && !isStandby)
         {
             //Float above player while holding item
+            transform.parent = null;
             trail.emitting = true;
             if (player.isRolling)
             {
@@ -156,6 +157,8 @@ public class Follower : MonoBehaviour
         }
         if (isReturning)
         {
+            transform.parent = null;
+            isStandby = false;
             lookTarget = player.ballTrans.position;
             modelAngleDest = Vector3.zero;
             trail.emitting = true;
