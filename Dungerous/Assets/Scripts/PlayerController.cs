@@ -125,6 +125,9 @@ public class PlayerController : MonoBehaviour
 
     public Follower follower;
 
+    //Prefab Effects
+    public GameObject boostJumpEffect, highJumpEffect, shoveEffect;
+
     private void Awake()
     {
         controls = new PlayerControls();
@@ -229,6 +232,8 @@ public class PlayerController : MonoBehaviour
                     //Perfect Boost Jump
                     highJumpReady = false;
                     boostJumping = true;
+                    GameObject boostEffect = Instantiate(boostJumpEffect, transform.position + (Vector3.up * 0.75f), transform.rotation, null);
+                    Destroy(boostEffect, 1f);
                     highJumpLimit++;
                     shoveHighJumpTime = maxShoveHighJumpTime;
                 }
@@ -237,6 +242,8 @@ public class PlayerController : MonoBehaviour
                     //Standard High Jump
                     highJumpReady = false;
                     boostJumping = false;
+                    GameObject highShoveJumpEffect = Instantiate(highJumpEffect, transform.position, transform.rotation, null);
+                    Destroy(highShoveJumpEffect, 1f);
                     highJumpLimit++;
                     shoveHighJumpTime = maxShoveHighJumpTime;
                 }
@@ -472,6 +479,7 @@ public class PlayerController : MonoBehaviour
 
     void MoveIndependent()
     {
+        ballLogic.isRide = false;
         if (wallShoveTime <= moveOutOfShoveOffTime)
         {
             moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
@@ -523,6 +531,7 @@ public class PlayerController : MonoBehaviour
 
     void MoveBall()
     {
+        ballLogic.isRide = false;
         moveDirectionR = new Vector3(moveRInput.x, 0, moveRInput.y);
         moveDirection = transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(ballTrans.position.x - transform.position.x, 0, ballTrans.position.z - transform.position.z)), rotateSpeed * Time.deltaTime);
@@ -566,12 +575,12 @@ public class PlayerController : MonoBehaviour
             if (ballLogic.rb.velocity.y < -7)
             {
                 ballLogic.slopePowerTime += 1 * Time.deltaTime;
-                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 10 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 10, moveDirection.normalized.z * rideMoveSpeed * 10 * Time.fixedDeltaTime), ballRideAcceleration * 8 * Time.deltaTime));
+                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 10 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 10, moveDirection.normalized.z * rideMoveSpeed * 10 * Time.fixedDeltaTime), ballRideAcceleration * 6 * Time.deltaTime));
             }
             else if(ballLogic.slopePowered)
             {
                 ballLogic.slopePowerTime -= Time.deltaTime;
-                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 7 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 7, moveDirection.normalized.z * rideMoveSpeed * 7 * Time.fixedDeltaTime), ballRideAcceleration * 8 * Time.deltaTime));
+                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 7 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 7, moveDirection.normalized.z * rideMoveSpeed * 7 * Time.fixedDeltaTime), ballRideAcceleration * 7 * Time.deltaTime));
             }
             else
             {
@@ -612,13 +621,30 @@ public class PlayerController : MonoBehaviour
                 {
                     if (shoveCol[i].GetComponent<Rigidbody>())
                     {
-                        shoveCol[i].GetComponent<Rigidbody>().velocity += ((shoveCol[i].transform.position - transform.position) * shoveForce / shoveCol[i].GetComponent<Rigidbody>().mass);
+                        if (boostJumping)
+                        {
+                            shoveCol[i].GetComponent<Rigidbody>().velocity += ((shoveCol[i].transform.position - transform.position) * shoveForce * 2 / shoveCol[i].GetComponent<Rigidbody>().mass);
+                            shoveCooldownTime = startShoveCooldownTime * 1.5f;
+                        }
+                        else
+                        {
+                            shoveCol[i].GetComponent<Rigidbody>().velocity += ((shoveCol[i].transform.position - transform.position) * shoveForce / shoveCol[i].GetComponent<Rigidbody>().mass);
+                        }
                     }
                     if (shoveCol[i].GetComponent<EnemyHealth>())
                     {
-                        shoveCol[i].GetComponent<EnemyHealth>().TakeDamage(0, 1, (shoveCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
+                        if (boostJumping)
+                        {
+                            shoveCol[i].GetComponent<EnemyHealth>().TakeDamage(0, 1.5f, (shoveCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
+                        }
+                        else
+                        {
+                            shoveCol[i].GetComponent<EnemyHealth>().TakeDamage(0, 1, (shoveCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
+                        }
                     }
                 }
+                GameObject shoveEft = Instantiate(shoveEffect, shovePoint.position - (shovePoint.forward * 0.25f), shovePoint.rotation, null);
+                Destroy(shoveEft, 1f);
             }
             else if(Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShoveOff))
             {
@@ -627,6 +653,8 @@ public class PlayerController : MonoBehaviour
                 {
                     wallShoveTime = maxWallShoveTime;
                     shoveCooldownTime = startShoveCooldownTime / 3;
+                    GameObject shoveEft = Instantiate(shoveEffect, shovePoint.position - (shovePoint.forward * 0.25f), shovePoint.rotation, null);
+                    Destroy(shoveEft, 1f);
                 }
             }
         }

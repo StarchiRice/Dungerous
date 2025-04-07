@@ -9,7 +9,7 @@ public class BallController : MonoBehaviour
 
     private Vector3 ballRightDir;
 
-    public bool freeRoll;
+    public bool freeRoll, isRide;
 
     public bool canRide;
     public Transform ballRideCheck, ballRidePoint;
@@ -108,6 +108,7 @@ public class BallController : MonoBehaviour
     public void BallRide()
     {
         freeRoll = true;
+        isRide = true;
     }
 
     private void OnDrawGizmosSelected()

@@ -272,7 +272,7 @@ Transform:
   - {fileID: 3547923527703863366}
   - {fileID: 7257573262625707687}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4321982354148605383
 MonoBehaviour:
@@ -305,7 +305,7 @@ MonoBehaviour:
   boostJumpHeightMod: 0.75
   hangTimeGravityMod: 0
   hangTimeRateChange: 8
-  groundCheckRadius: 0.48
+  groundCheckRadius: 0.495
   isGrounded: 0
   whatIsGround:
     serializedVersion: 2
@@ -324,7 +324,7 @@ MonoBehaviour:
   startShoveCooldownTime: 1
   shovePoint: {fileID: 429273313216517695}
   shoveRadius: 0.5
-  shoveForce: 25
+  shoveForce: 35
   whatCanShove:
     serializedVersion: 2
     m_Bits: 16512
@@ -369,6 +369,12 @@ MonoBehaviour:
   ballLogic: {fileID: 0}
   groundCheck: {fileID: 2887088437009553755}
   follower: {fileID: 0}
+  boostJumpEffect: {fileID: 7100075110246133151, guid: f81cdd02468288749bd211429aa415ba,
+    type: 3}
+  highJumpEffect: {fileID: 7100075110246133151, guid: f15470c5b5d839e49936723e22c672a0,
+    type: 3}
+  shoveEffect: {fileID: 353045628540793895, guid: 4430242b70bb1a449a4c01329b30b9af,
+    type: 3}
 --- !u!114 &1067090100618818324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -451,7 +457,7 @@ CharacterController:
   m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!95 &4696345925117593061
@@ -856,8 +862,8 @@ MonoBehaviour:
   m_UVBias: {x: 0, y: 0}
   m_DecalLayerMask: 1
   m_ScaleMode: 0
-  m_Offset: {x: 0, y: 0, z: 5}
-  m_Size: {x: 1.1, y: 1.1, z: 10}
+  m_Offset: {x: 0, y: 0, z: 2.5}
+  m_Size: {x: 1.1, y: 1.1, z: 5}
   m_FadeFactor: 0.3
 --- !u!1 &8225675392143512402
 GameObject:
