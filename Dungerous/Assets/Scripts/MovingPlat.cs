@@ -14,6 +14,8 @@ public class MovingPlat : MonoBehaviour
     public Vector3 extents;
     public Collider playerCol;
 
+    public int[] stopPoints;
+
     //References
     public Transform[] destinationPoints;
     public Rigidbody platform;
@@ -70,7 +72,15 @@ public class MovingPlat : MonoBehaviour
         {
             platform.MovePosition(platform.position + (destinationPoints[curDestIndex].position - platform.position).normalized * Time.fixedDeltaTime * moveSpeed);
             playerPlat.transform.position = Vector3.MoveTowards(playerPlat.transform.position, platform.position, Time.deltaTime * moveSpeed);
-            curWaitTime = waitTime;
+            platform.MoveRotation(Quaternion.RotateTowards(platform.rotation, destinationPoints[curDestIndex].transform.rotation, 10 * Time.fixedDeltaTime));
+            playerPlat.transform.rotation = Quaternion.RotateTowards(playerPlat.transform.rotation, platform.rotation, 15 * Time.deltaTime);
+            for (int i = 0; i < stopPoints.Length; i++)
+            {
+                if (curDestIndex == stopPoints[i])
+                {
+                    curWaitTime = waitTime;
+                }
+            }
         }
     }
 

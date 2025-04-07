@@ -230,7 +230,7 @@ Transform:
   - {fileID: 6219071132362584871}
   - {fileID: 695493484812551508}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2905039844344954812
 MonoBehaviour:
@@ -258,8 +258,10 @@ MonoBehaviour:
   groundCheckRadius: 2.35
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 65600
   freeRolVel: {x: 0, y: 0, z: 0}
+  slopePowered: 0
+  slopePowerTime: 0
   ballModel: {fileID: 8157658402580222543}
   rb: {fileID: 0}
 --- !u!114 &2744704539994979221

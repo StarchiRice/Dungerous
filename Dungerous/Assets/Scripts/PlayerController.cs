@@ -33,6 +33,10 @@ public class PlayerController : MonoBehaviour
     private float highJumpBuffer;
     public int highJumpLimit;
 
+    public float shoveBoostJumpForce;
+    public bool boostJumping;
+    public float boostJumpHeightMod;
+
     public float hangTimeGravityMod;
     public float hangTimeRateChange;
 
@@ -222,13 +226,17 @@ public class PlayerController : MonoBehaviour
                 }
                 else if(controls.Gameplay.HoldUseItem.WasReleasedThisFrame() && isGrounded == true && highJumpReady && equipCtrl.curItemID == 0)
                 {
+                    //Perfect Boost Jump
                     highJumpReady = false;
+                    boostJumping = true;
                     highJumpLimit++;
                     shoveHighJumpTime = maxShoveHighJumpTime;
                 }
                 else if(highJumpReady && highJumpBuffer <= 0 && isGrounded)
                 {
+                    //Standard High Jump
                     highJumpReady = false;
+                    boostJumping = false;
                     highJumpLimit++;
                     shoveHighJumpTime = maxShoveHighJumpTime;
                 }
@@ -261,6 +269,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else if(isGrounded)
                 {
+                    boostJumping = false;
                     highJumpLimit = 0;
                 }
 
@@ -534,6 +543,7 @@ public class PlayerController : MonoBehaviour
         {
             isMovingBall = true;
             charCtrl.Move(new Vector3(moveDirection.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirection.normalized.z * rollMoveSpeed) * Time.deltaTime);
+            charCtrl.Move(new Vector3(transform.right.x * moveDirectionR.x * rollMoveSpeed, 0, transform.right.z * moveDirectionR.x * rollMoveSpeed) * Time.deltaTime);
             ballCtrl.Move(new Vector3(moveDirection.normalized.x * rollMoveSpeed, Physics.gravity.y, moveDirection.normalized.z * rollMoveSpeed) * Time.deltaTime);
         }
         else
@@ -630,7 +640,14 @@ public class PlayerController : MonoBehaviour
 
     public void ShoveHighJump()
     {
-        charCtrl.Move(Vector3.up * shoveHighJumpForce * shoveHighJumpTime * Time.deltaTime);
+        if (boostJumping)
+        {
+            charCtrl.Move((transform.forward + (Vector3.up * boostJumpHeightMod)) * shoveBoostJumpForce * shoveHighJumpTime * Time.deltaTime);
+        }
+        else
+        {
+            charCtrl.Move(Vector3.up * shoveHighJumpForce * shoveHighJumpTime * Time.deltaTime);
+        }
     }
 
     public void SwingSword(bool followUpSwing)

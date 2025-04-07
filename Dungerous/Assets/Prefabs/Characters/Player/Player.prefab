@@ -272,7 +272,7 @@ Transform:
   - {fileID: 3547923527703863366}
   - {fileID: 7257573262625707687}
   m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4321982354148605383
 MonoBehaviour:
@@ -300,6 +300,9 @@ MonoBehaviour:
   highJumpReady: 0
   maxHighJumpBuffer: 0.25
   highJumpLimit: 0
+  shoveBoostJumpForce: 50
+  boostJumping: 0
+  boostJumpHeightMod: 0.75
   hangTimeGravityMod: 0
   hangTimeRateChange: 8
   groundCheckRadius: 0.48
@@ -548,7 +551,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 63479
+    m_Bits: 129015
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
