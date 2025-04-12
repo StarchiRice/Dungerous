@@ -37,13 +37,12 @@ public class MovingPlat : MonoBehaviour
 
     public void MovePlatform()
     {
-        if (Physics.CheckBox(rideDetectPoint.position, extents, Quaternion.identity, whatCanRide))
+        if (Physics.CheckBox(rideDetectPoint.position, extents, playerPlat.transform.rotation, whatCanRide))
         {
-            Collider[] ridingColliders = Physics.OverlapBox(rideDetectPoint.position, extents, Quaternion.identity, whatCanRide);
+            Collider[] ridingColliders = Physics.OverlapBox(rideDetectPoint.position, extents, playerPlat.transform.rotation, whatCanRide);
             if (ridingColliders.Length > 0)
             {
                 playerAccounted = false;
-                ballAccounted = false;
                 for (int i = 0; i < ridingColliders.Length; i++)
                 {
                     if (ridingColliders[i].GetComponent<PlayerController>())
@@ -52,23 +51,12 @@ public class MovingPlat : MonoBehaviour
                         playerCol = ridingColliders[i];
                         playerCol.transform.parent = playerPlat.transform;
                     }
-                    if (ridingColliders[i].GetComponent<BallController>())
-                    {
-                        ballAccounted = true;
-                        ballCol = ridingColliders[i];
-                        ballCol.transform.parent = platform.transform;
-                    }
                     if(i == ridingColliders.Length - 1)
                     {
                         if (!playerAccounted && playerCol != null)
                         {
                             playerCol.transform.parent = null;
                             playerCol = null;
-                        }
-                        if (!ballAccounted && ballCol != null)
-                        {
-                            ballCol.transform.parent = null;
-                            ballCol = null;
                         }
                     }
                 }
@@ -79,12 +67,6 @@ public class MovingPlat : MonoBehaviour
             playerAccounted = false;
             playerCol.transform.parent = null;
             playerCol = null;
-        }
-        else if(ballCol != null)
-        {
-            ballAccounted = false;
-            ballCol.transform.parent = null;
-            ballCol = null;
         }
         if (Vector3.Distance(platform.transform.position, destinationPoints[curDestIndex].position) <= 0.1f)
         {

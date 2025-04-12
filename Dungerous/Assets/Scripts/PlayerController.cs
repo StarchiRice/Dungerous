@@ -6,6 +6,7 @@ using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour
     public float hangTimeGravityMod;
     public float hangTimeRateChange;
 
+    private float groundHeight;
     public float groundCheckRadius;
     public bool isGrounded, isOnBall;
     public LayerMask whatIsGround;
@@ -128,6 +130,8 @@ public class PlayerController : MonoBehaviour
     private InventoryController inventoryCtrl;
     private EquipmentController equipCtrl;
 
+    public DecalProjector shadowProject;
+
     public Follower follower;
 
     //Prefab Effects
@@ -188,16 +192,26 @@ public class PlayerController : MonoBehaviour
             currentSlope = 0;
         }
 
-        //Control ground check by sphere and normal slope
-
-        if (Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround))
+        //Set Shadow Position
+        RaycastHit shadowHit;
+        if (Physics.Raycast(shadowProject.transform.position, -transform.up, out shadowHit, float.PositiveInfinity, whatIsGround))
         {
-            isOnBall = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsBall);
-            if (isOnBall == true)
-            {
-                isGrounded = true;
-            }
-            else if (currentSlope > 0)
+            Debug.DrawRay(shadowProject.transform.position, -transform.up * Vector3.Distance(shadowProject.transform.position, shadowHit.point), Color.black);
+            groundHeight = Vector3.Distance(shadowProject.transform.position, shadowHit.point) + 1;
+            shadowProject.size = new Vector3(shadowProject.size.x, shadowProject.size.y, groundHeight);
+            shadowProject.pivot = new Vector3(0, 0, groundHeight / 2);
+        }
+
+        //Control ground check by sphere and normal slope
+        if (Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsBall))
+        {
+            isOnBall = true;
+            isGrounded = true;
+        }
+        else if (Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround))
+        {
+            isOnBall = false;
+            if (currentSlope > 0)
             {
                 isGrounded = true;
             }
@@ -208,6 +222,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            isOnBall = false;
             isGrounded = false;
         }
 
@@ -725,6 +740,7 @@ public class PlayerController : MonoBehaviour
                     RaycastHit shoveHit;
                     if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward, out shoveHit, shoveRadius * 3, whatCanShoveOff))
                     {
+                        transform.rotation = Quaternion.LookRotation(new Vector3(-shoveHit.normal.x, 0, -shoveHit.normal.z));
                         GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point + (shoveHit.transform.forward * 0.25f), Quaternion.LookRotation(-shoveHit.normal), null);
                         Destroy(shoveEft, 1f);
                     }

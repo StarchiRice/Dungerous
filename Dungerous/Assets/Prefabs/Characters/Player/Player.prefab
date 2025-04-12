@@ -308,12 +308,13 @@ MonoBehaviour:
   hangTimeRateChange: 8
   groundCheckRadius: 0.495
   isGrounded: 0
+  isOnBall: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 25664
   whatIsBall:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 1152
   hitNormal: {x: 0, y: 0, z: 0}
   slopeLimit: 60
   currentSlope: 0
@@ -376,6 +377,7 @@ MonoBehaviour:
   ballTrans: {fileID: 0}
   ballLogic: {fileID: 0}
   groundCheck: {fileID: 2887088437009553755}
+  shadowProject: {fileID: 6901154627086267879}
   follower: {fileID: 0}
   boostJumpEffect: {fileID: 7100075110246133151, guid: f81cdd02468288749bd211429aa415ba,
     type: 3}
@@ -463,7 +465,7 @@ CharacterController:
   serializedVersion: 3
   m_Height: 1.5
   m_Radius: 0.5
-  m_SlopeLimit: 80
+  m_SlopeLimit: 90
   m_StepOffset: 0.3
   m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
