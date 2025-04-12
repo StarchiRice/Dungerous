@@ -41,8 +41,13 @@ public class PlayerController : MonoBehaviour
     public float hangTimeRateChange;
 
     public float groundCheckRadius;
-    public bool isGrounded;
+    public bool isGrounded, isOnBall;
     public LayerMask whatIsGround;
+    public LayerMask whatIsBall;
+    public Vector3 hitNormal;
+    public float slopeLimit;
+    public float currentSlope;
+    public float slideFriction;
 
     public bool isRolling = false, isRiding = false;
     public Vector2 moveLInput;
@@ -164,13 +169,50 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        hitNormal = hit.normal;
+    }
+
     void Update()
     {
+        RaycastHit groundHit;
+        if (Physics.Raycast(groundCheck.position, -transform.up, out groundHit, groundCheckRadius, whatIsGround))
+        {
+            Debug.DrawRay(groundCheck.position, -transform.up * groundCheckRadius, Color.red);
+            currentSlope = groundHit.normal.y * 90;
+        }
+        else
+        {
+            currentSlope = 0;
+        }
 
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround);
+        //Control ground check by sphere and normal slope
+
+        if (Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround))
+        {
+            isOnBall = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsBall);
+            if (isOnBall == true)
+            {
+                isGrounded = true;
+            }
+            else if (currentSlope > 0)
+            {
+                isGrounded = true;
+            }
+            else
+            {
+                isGrounded = (Vector3.Angle(Vector3.up, hitNormal) <= slopeLimit);
+            }
+        }
+        else
+        {
+            isGrounded = false;
+        }
 
         //Toggle riding the ball when on top
-        if(ballLogic.canRide && highJumpReady == false)
+        if (ballLogic.canRide && highJumpReady == false)
         {
             if(controls.Gameplay.ModeToggle.WasPerformedThisFrame())
             {
@@ -479,6 +521,12 @@ public class PlayerController : MonoBehaviour
 
     void MoveIndependent()
     {
+        //Character sliding of surfaces
+        if (!isGrounded)
+        {
+            charCtrl.Move(new Vector3((1f - hitNormal.y) * hitNormal.x * (1f - slideFriction), 0, (1f - hitNormal.y) * hitNormal.z * (1f - slideFriction)) * Time.deltaTime);
+        }
+
         ballLogic.isRide = false;
         if (wallShoveTime <= moveOutOfShoveOffTime)
         {
@@ -625,10 +673,23 @@ public class PlayerController : MonoBehaviour
                         {
                             shoveCol[i].GetComponent<Rigidbody>().velocity += ((shoveCol[i].transform.position - transform.position) * shoveForce * 2 / shoveCol[i].GetComponent<Rigidbody>().mass);
                             shoveCooldownTime = startShoveCooldownTime * 1.5f;
+                            boostJumping = false;
+                            RaycastHit shoveHit;
+                            if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward, out shoveHit, shoveRadius * 3, whatCanShove))
+                            {
+                                GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point + (shoveHit.transform.forward * 0.25f), Quaternion.LookRotation(-shoveHit.normal), null);
+                                Destroy(shoveEft, 1f);
+                            }
                         }
                         else
                         {
                             shoveCol[i].GetComponent<Rigidbody>().velocity += ((shoveCol[i].transform.position - transform.position) * shoveForce / shoveCol[i].GetComponent<Rigidbody>().mass);
+                            RaycastHit shoveHit;
+                            if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward, out shoveHit, shoveRadius * 3, whatCanShove))
+                            {
+                                GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point + (shoveHit.transform.forward * 0.25f), Quaternion.LookRotation(-shoveHit.normal), null);
+                                Destroy(shoveEft, 1f);
+                            }
                         }
                     }
                     if (shoveCol[i].GetComponent<EnemyHealth>())
@@ -636,25 +697,37 @@ public class PlayerController : MonoBehaviour
                         if (boostJumping)
                         {
                             shoveCol[i].GetComponent<EnemyHealth>().TakeDamage(0, 1.5f, (shoveCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
+                            boostJumping = false;
                         }
                         else
                         {
                             shoveCol[i].GetComponent<EnemyHealth>().TakeDamage(0, 1, (shoveCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
                         }
+                        GameObject shoveEft = Instantiate(shoveEffect, shovePoint.position + (transform.forward * 0.25f), shovePoint.rotation, null);
                     }
                 }
-                GameObject shoveEft = Instantiate(shoveEffect, shovePoint.position - (shovePoint.forward * 0.25f), shovePoint.rotation, null);
-                Destroy(shoveEft, 1f);
             }
-            else if(Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShoveOff))
+            else if (Physics.CheckSphere(shovePoint.position, shoveRadius, whatCanShoveOff))
             {
                 Collider shoveOffCol = Physics.OverlapSphere(shovePoint.position, shoveRadius, whatCanShoveOff)[0];
                 if (shoveOffCol != null && isGrounded == false)
                 {
-                    wallShoveTime = maxWallShoveTime;
+                    if (boostJumping)
+                    {
+                        wallShoveTime = maxWallShoveTime * 1.2f;
+                        boostJumping = false;
+                    }
+                    else
+                    {
+                        wallShoveTime = maxWallShoveTime;
+                    }
                     shoveCooldownTime = startShoveCooldownTime / 3;
-                    GameObject shoveEft = Instantiate(shoveEffect, shovePoint.position - (shovePoint.forward * 0.25f), shovePoint.rotation, null);
-                    Destroy(shoveEft, 1f);
+                    RaycastHit shoveHit;
+                    if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward, out shoveHit, shoveRadius * 3, whatCanShoveOff))
+                    {
+                        GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point + (shoveHit.transform.forward * 0.25f), Quaternion.LookRotation(-shoveHit.normal), null);
+                        Destroy(shoveEft, 1f);
+                    }
                 }
             }
         }
@@ -860,6 +933,9 @@ public class PlayerController : MonoBehaviour
 
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(shovePoint.position, shoveRadius);
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawRay(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward * shoveRadius * 2);
 
         if (isAttacking)
         {

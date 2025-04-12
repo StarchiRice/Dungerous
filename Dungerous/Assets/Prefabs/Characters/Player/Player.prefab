@@ -271,6 +271,7 @@ Transform:
   - {fileID: 8346953572071763356}
   - {fileID: 3547923527703863366}
   - {fileID: 7257573262625707687}
+  - {fileID: 1981249285844482832}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -299,7 +300,7 @@ MonoBehaviour:
   maxShoveHighJumpTime: 0.4
   highJumpReady: 0
   maxHighJumpBuffer: 0.25
-  highJumpLimit: 0
+  highJumpLimit: 1
   shoveBoostJumpForce: 50
   boostJumping: 0
   boostJumpHeightMod: 0.75
@@ -310,6 +311,13 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 25664
+  whatIsBall:
+    serializedVersion: 2
+    m_Bits: 1024
+  hitNormal: {x: 0, y: 0, z: 0}
+  slopeLimit: 60
+  currentSlope: 0
+  slideFriction: 0
   isRolling: 0
   isRiding: 0
   moveLInput: {x: 0, y: 0}
@@ -330,7 +338,7 @@ MonoBehaviour:
     m_Bits: 16512
   whatCanShoveOff:
     serializedVersion: 2
-    m_Bits: 8256
+    m_Bits: 139328
   moveOutOfShoveOffTime: 0.1
   swordHitBoxRadius: 1.2
   swordHitBoxPoint: {fileID: 2615027403777167896}
@@ -444,7 +452,7 @@ CharacterController:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 1536
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -455,7 +463,7 @@ CharacterController:
   serializedVersion: 3
   m_Height: 1.5
   m_Radius: 0.5
-  m_SlopeLimit: 45
+  m_SlopeLimit: 80
   m_StepOffset: 0.3
   m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
@@ -481,6 +489,61 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &4909933529362213187
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1981249285844482832}
+  - component: {fileID: 7166213948351503058}
+  m_Layer: 0
+  m_Name: Wall Col Fix
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1981249285844482832
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4909933529362213187}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8440866486158366687}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &7166213948351503058
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4909933529362213187}
+  m_Material: {fileID: 13400000, guid: 06a3ad911d9f4f94fb81015d5542bd1c, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 131072
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 131063
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1.5
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!1 &5169784429896163671
 GameObject:
   m_ObjectHideFlags: 0
@@ -557,7 +620,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 129015
+    m_Bits: 260087
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -740,7 +803,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6255109780925618133}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.25, z: 0}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1129,6 +1192,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8607420460703196451, guid: 31a55be58ce8a5246b34aeed7b8a8b4c,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8607420460703196451, guid: 31a55be58ce8a5246b34aeed7b8a8b4c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: f23420a0d59f7fb4ab367daf8ddd3ec9, type: 2}
     - target: {fileID: 919132149155446097, guid: 31a55be58ce8a5246b34aeed7b8a8b4c,
         type: 3}
       propertyPath: m_Name
