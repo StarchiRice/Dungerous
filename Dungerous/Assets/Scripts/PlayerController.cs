@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
     public Vector2 moveLInput;
     public Vector2 moveRInput;
 
-    public Vector3 moveDirection, moveDirectionR;
+    public Vector3 moveDirection, moveDirectionR, storedDirection;
     private bool isMoving;
     private bool isMovingBall;
 
@@ -571,13 +571,42 @@ public class PlayerController : MonoBehaviour
             charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, 0, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
         }
 
-        if (moveDirection != Vector3.zero && wallShoveTime <= moveOutOfShoveOffTime)
+        if (moveDirection != Vector3.zero && wallShoveTime <= moveOutOfShoveOffTime && curSwingBuffer <= 0)
         {
             isMoving = true;
+            storedDirection = moveDirection;
             if (curSwordSpinDuration <= 0.3f)
             {
-                model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount)), rotateSpeed * Time.deltaTime);
+                model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount)), rotateSpeed / 3 * Time.deltaTime);
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed * Time.deltaTime);
+            }
+        }
+        else if(curSwingBuffer > 0)
+        {
+            if (isGrounded)
+            {
+                model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(-transform.TransformDirection(moveDirection.normalized.z * moveModelLeanAmount / 2, 0, moveDirection.normalized.x * moveModelLeanAmount / 2)), rotateSpeed / 2 * Time.deltaTime);
+            }
+            else
+            {
+                if(moveDirection != Vector3.zero)
+                {
+                    model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(transform.TransformDirection(moveDirection.normalized.z * moveModelLeanAmount * 3, 0, moveDirection.normalized.x * moveModelLeanAmount * 3)), rotateSpeed / 2 * Time.deltaTime);
+                    storedDirection = moveDirection;
+                }
+                else
+                {
+                    model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(transform.TransformDirection(storedDirection.normalized.z * moveModelLeanAmount * 3, 0, storedDirection.normalized.x * moveModelLeanAmount * 3)), rotateSpeed / 2 * Time.deltaTime);
+                }
+            }
+            if (moveDirection != Vector3.zero)
+            {
+                isMoving = true;
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed * Time.deltaTime);
+            }
+            else
+            {
+                isMoving = false;
             }
         }
         else

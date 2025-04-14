@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2021267336133966370}
-  - component: {fileID: 6833437425993219078}
+  - component: {fileID: 4159762526724626806}
   m_Layer: 6
   m_Name: Awning
   m_TagString: Untagged
@@ -24,15 +24,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4717588905369089985}
-  m_LocalRotation: {x: 0.11866505, y: -0.05202066, z: 0.37813967, w: -0.9166367}
-  m_LocalPosition: {x: -2.116, y: -2.118, z: 6.755}
+  m_LocalRotation: {x: -0.10118982, y: 0.04627979, z: -0.37089947, w: 0.9219829}
+  m_LocalPosition: {x: -2.112, y: -2.114, z: 6.779}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3456554511603126619}
   m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: -10.265, y: 10.843, z: -45.812}
---- !u!65 &6833437425993219078
+  m_LocalEulerAnglesHint: {x: -8.758, y: 9.34, z: -44.545}
+--- !u!65 &4159762526724626806
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -51,7 +51,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.6, y: 1.25, z: 0.15}
+  m_Size: {x: 1.5, y: 1.25, z: 0.15}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2914567275537086128
 PrefabInstance:
