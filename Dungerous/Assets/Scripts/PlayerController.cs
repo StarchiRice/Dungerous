@@ -571,18 +571,18 @@ public class PlayerController : MonoBehaviour
             charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, 0, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
         }
 
-        if (moveDirection != Vector3.zero)
+        if (moveDirection != Vector3.zero && wallShoveTime <= moveOutOfShoveOffTime)
         {
             isMoving = true;
             if (curSwordSpinDuration <= 0.3f)
             {
-                model.transform.localRotation = Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount));
+                model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount)), rotateSpeed * Time.deltaTime);
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed * Time.deltaTime);
             }
         }
         else
         {
-            model.transform.localEulerAngles = Vector3.zero;
+            model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.identity, rotateSpeed * Time.deltaTime);
             isMoving = false;
         }
     }
@@ -692,7 +692,7 @@ public class PlayerController : MonoBehaviour
                             RaycastHit shoveHit;
                             if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward, out shoveHit, shoveRadius * 3, whatCanShove))
                             {
-                                GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point + (shoveHit.transform.forward * 0.25f), Quaternion.LookRotation(-shoveHit.normal), null);
+                                GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point - (shoveHit.transform.TransformDirection(shoveHit.transform.forward * 0.25f)), Quaternion.LookRotation(-shoveHit.normal), null);
                                 Destroy(shoveEft, 1f);
                             }
                         }
@@ -702,7 +702,7 @@ public class PlayerController : MonoBehaviour
                             RaycastHit shoveHit;
                             if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward, out shoveHit, shoveRadius * 3, whatCanShove))
                             {
-                                GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point + (shoveHit.transform.forward * 0.25f), Quaternion.LookRotation(-shoveHit.normal), null);
+                                GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point - (shoveHit.transform.TransformDirection(shoveHit.transform.forward * 0.2f)), Quaternion.LookRotation(-shoveHit.normal), null);
                                 Destroy(shoveEft, 1f);
                             }
                         }
@@ -740,10 +740,19 @@ public class PlayerController : MonoBehaviour
                     RaycastHit shoveHit;
                     if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.forward, out shoveHit, shoveRadius * 3, whatCanShoveOff))
                     {
-                        transform.rotation = Quaternion.LookRotation(new Vector3(-shoveHit.normal.x, 0, -shoveHit.normal.z));
-                        GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point + (shoveHit.transform.forward * 0.25f), Quaternion.LookRotation(-shoveHit.normal), null);
-                        Destroy(shoveEft, 1f);
                     }
+                    else if(Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), -transform.right, out shoveHit, shoveRadius * 3, whatCanShoveOff))
+                    {
+                    }
+                    else if (Physics.Raycast(shovePoint.position - (shovePoint.forward * shoveRadius), transform.right, out shoveHit, shoveRadius * 3, whatCanShoveOff))
+                    {   
+                    }
+                    else if (Physics.Raycast(shovePoint.position, -transform.up, out shoveHit, shoveRadius * 3, whatCanShoveOff))
+                    {
+                    }
+                    transform.rotation = Quaternion.LookRotation(new Vector3(-shoveHit.normal.x, 0, -shoveHit.normal.z));
+                    GameObject shoveEft = Instantiate(shoveEffect, shoveHit.point - (shoveHit.transform.TransformDirection(shoveHit.transform.forward * 0.25f)), Quaternion.LookRotation(-shoveHit.normal), null);
+                    Destroy(shoveEft, 1f);
                 }
             }
         }

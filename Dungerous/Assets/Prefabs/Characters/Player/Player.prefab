@@ -340,7 +340,7 @@ MonoBehaviour:
   whatCanShoveOff:
     serializedVersion: 2
     m_Bits: 139328
-  moveOutOfShoveOffTime: 0.1
+  moveOutOfShoveOffTime: 0.2
   swordHitBoxRadius: 1.2
   swordHitBoxPoint: {fileID: 2615027403777167896}
   whatCanSwordHit:
