@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour
     public PlayerControls controls;
     public PlayerInput playerInp;
     private Animator anim;
-    public GameObject model;
+    public GameObject model, modelPivot;
     [HideInInspector]
     public CameraController cam;
 
@@ -133,7 +133,7 @@ public class PlayerController : MonoBehaviour
     private EquipmentController equipCtrl;
 
     public DecalProjector shadowProject;
-    public ParticleSystem runParticleEffect;
+    public ParticleSystem runParticleEffect, altRunParticleEffect;
 
     public Follower follower;
 
@@ -231,6 +231,15 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded)
         {
+            if (currentSlope >= slopeLimit)
+            {
+                modelPivot.transform.localRotation = Quaternion.Slerp(modelPivot.transform.localRotation, Quaternion.FromToRotation(Vector3.up, transform.InverseTransformDirection(groundHit.normal)), rotateSpeed / 2 * Time.deltaTime);
+            }
+            else
+            {
+                modelPivot.transform.localRotation = Quaternion.Slerp(modelPivot.transform.localRotation, Quaternion.identity, rotateSpeed / 2 * Time.deltaTime);
+            }
+
             if (controls.Gameplay.Run.IsPressed())
             {
                 isRunning = true;
@@ -239,6 +248,10 @@ public class PlayerController : MonoBehaviour
             {
                 isRunning = false;
             }
+        }
+        else
+        {
+            modelPivot.transform.localRotation = Quaternion.Slerp(modelPivot.transform.localRotation, Quaternion.identity, rotateSpeed / 2 * Time.deltaTime);
         }
 
         //Toggle riding the ball when on top
@@ -612,9 +625,10 @@ public class PlayerController : MonoBehaviour
                     Vector3 findDirection = transform.TransformDirection(moveDirection.z, 0, moveDirection.x);
                     if (runAlternating)
                     {
-                        if (runParticleEffect.isPlaying == false)
+                        if (altRunParticleEffect.isPlaying == false)
                         {
-                            runParticleEffect.Play();
+                            altRunParticleEffect.Play();
+                            runParticleEffect.Stop();
                         }
                         model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(new Vector3(findDirection.x * (moveModelLeanAmount * 1.5f), 0, findDirection.z * (-moveModelLeanAmount * 1.5f))), rotateSpeed * 1.5f * Time.deltaTime);
                     }
@@ -623,23 +637,26 @@ public class PlayerController : MonoBehaviour
                         if (runParticleEffect.isPlaying == false)
                         {
                             runParticleEffect.Play();
+                            altRunParticleEffect.Stop();
                         }
                         model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(new Vector3(findDirection.x * moveModelLeanAmount, 0, findDirection.z * -moveModelLeanAmount)), rotateSpeed * Time.deltaTime);
                     }
                     else
                     {
-                        if (runParticleEffect.isPlaying == true)
+                        if (runParticleEffect.isPlaying == true || altRunParticleEffect.isPlaying == true)
                         {
                             runParticleEffect.Stop();
+                            altRunParticleEffect.Stop();
                         }
                         model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(new Vector3(findDirection.x * -moveModelLeanAmount, 0, findDirection.z * -moveModelLeanAmount)), rotateSpeed / 3 * Time.deltaTime);
                     }
                 }
                 else
                 {
-                    if (runParticleEffect.isPlaying == true)
+                    if (runParticleEffect.isPlaying == true || altRunParticleEffect.isPlaying == true)
                     {
                         runParticleEffect.Stop();
+                        altRunParticleEffect.Stop();
                     }
                     model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(model.transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount)), rotateSpeed / 3 * Time.deltaTime);
                 }
@@ -676,9 +693,10 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (runParticleEffect.isPlaying == true)
+            if (runParticleEffect.isPlaying == true || altRunParticleEffect.isPlaying == true)
             {
                 runParticleEffect.Stop();
+                altRunParticleEffect.Stop();
             }
             model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.identity, rotateSpeed * Time.deltaTime);
             isMoving = false;
@@ -692,23 +710,27 @@ public class PlayerController : MonoBehaviour
 
     void MoveBall()
     {
+        if (runParticleEffect.isPlaying == true || altRunParticleEffect.isPlaying == true)
+        {
+            runParticleEffect.Stop();
+            altRunParticleEffect.Stop();
+        }
         ballLogic.isRide = false;
         moveDirectionR = new Vector3(moveRInput.x, 0, moveRInput.y);
         moveDirection = transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(ballTrans.position.x - transform.position.x, 0, ballTrans.position.z - transform.position.z)), rotateSpeed * Time.deltaTime);
         model.transform.localEulerAngles = Vector3.zero;
-        if (Vector3.Distance(Vector3.up * transform.position.y, Vector3.up * ballTrans.position.y) > ballRollDistance * 0.45f)
+
+        RaycastHit ballDistHit;
+        if (Physics.Raycast(transform.position + (Vector3.up * charCtrl.height * 1.25f), (ballTrans.position - transform.position + (Vector3.up * charCtrl.height * 1.25f)).normalized, out ballDistHit, Vector3.Distance(transform.position + (Vector3.up * charCtrl.height * 1.25f), ballTrans.position), whatIsBall))
         {
-            charCtrl.Move((ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
+            Debug.DrawRay(transform.position + (Vector3.up * charCtrl.height * 1.25f), (ballTrans.position - transform.position + (Vector3.up * charCtrl.height * 1.25f)).normalized * Vector3.Distance(transform.position + (Vector3.up * charCtrl.height * 1.25f), ballDistHit.point), Color.cyan);
         }
-        else if (Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(ballTrans.position.x, 0, ballTrans.position.z)) > ballRollDistance)
-        {
-            charCtrl.Move((ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
-        }
-        else if (Vector3.Distance(transform.position, ballTrans.position) < ballRollDistance * 0.8f)
-        {
-            charCtrl.Move(-(ballTrans.position - transform.position).normalized * rollMoveSpeed * Time.deltaTime);
-        }
+
+        Vector3 correctedDistanceMaintainVector = ballDistHit.point + ((ballDistHit.point - ballTrans.position).normalized * ballRollDistance);
+
+        charCtrl.Move((correctedDistanceMaintainVector - (transform.position + (Vector3.up * charCtrl.height * 1.25f))).normalized * rollMoveSpeed * Time.deltaTime);
+
         if(moveLInput != Vector2.zero)
         {
             isMovingBall = true;
@@ -726,6 +748,11 @@ public class PlayerController : MonoBehaviour
 
     void RideBall()
     {
+        if (runParticleEffect.isPlaying == true || altRunParticleEffect.isPlaying == true)
+        {
+            runParticleEffect.Stop();
+            altRunParticleEffect.Stop();
+        }
         moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
         
         ballLogic.BallRide();
@@ -913,7 +940,7 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded)
         {
-            if (alternateCount > 2)
+            if (alternateCount > 1)
             {
                 runAlternating = true;
             }
@@ -1101,7 +1128,14 @@ public class PlayerController : MonoBehaviour
 
     public void ParticleOffset(int footID)
     {
-        runParticleEffect.transform.localPosition = new Vector3(0.15f * footID, 0, 0);
+        if (runAlternating)
+        {
+            altRunParticleEffect.transform.localPosition = new Vector3(0.15f * footID, 0, 0);
+        }
+        else if (isRunning)
+        {
+            runParticleEffect.transform.localPosition = new Vector3(0.15f * footID, 0, 0);
+        }
     }
 
     private void OnDrawGizmosSelected()
