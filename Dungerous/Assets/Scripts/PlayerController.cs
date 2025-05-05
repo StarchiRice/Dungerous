@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 public class PlayerController : MonoBehaviour
 {
     //Variables
-    public float moveSpeed;
+    public float moveSpeed, runSpeed, altRunSpeed;
     public float rollMoveSpeed;
     public float rotateSpeed;
     public float jumpForce;
@@ -51,7 +51,9 @@ public class PlayerController : MonoBehaviour
     public float currentSlope;
     public float slideFriction;
 
-    public bool isRolling = false, isRiding = false;
+    public bool isRolling = false, isRiding = false, isRunning, runAlternating;
+    public float maxAltWindowTime, curAltWindowTime;
+    public int alternateIndex, alternateCount; // 0 None, 1 Left, 2 Right
     public Vector2 moveLInput;
     public Vector2 moveRInput;
 
@@ -131,6 +133,7 @@ public class PlayerController : MonoBehaviour
     private EquipmentController equipCtrl;
 
     public DecalProjector shadowProject;
+    public ParticleSystem runParticleEffect;
 
     public Follower follower;
 
@@ -224,6 +227,18 @@ public class PlayerController : MonoBehaviour
         {
             isOnBall = false;
             isGrounded = false;
+        }
+
+        if (isGrounded)
+        {
+            if (controls.Gameplay.Run.IsPressed())
+            {
+                isRunning = true;
+            }
+            else
+            {
+                isRunning = false;
+            }
         }
 
         //Toggle riding the ball when on top
@@ -536,6 +551,7 @@ public class PlayerController : MonoBehaviour
 
     void MoveIndependent()
     {
+        AlternateRun();
         //Character sliding of surfaces
         if (!isGrounded)
         {
@@ -568,7 +584,21 @@ public class PlayerController : MonoBehaviour
         }
         else if (wallShoveTime <= moveOutOfShoveOffTime)
         {
-            charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, 0, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
+            if (runAlternating)
+            {
+                anim.SetFloat("RunSpeed", 1.4f);
+                charCtrl.Move(new Vector3(moveDirection.normalized.x * altRunSpeed, 0, moveDirection.normalized.z * altRunSpeed) * Time.deltaTime);
+            }
+            else if(isRunning)
+            {
+                anim.SetFloat("RunSpeed", 1.2f);
+                charCtrl.Move(new Vector3(moveDirection.normalized.x * runSpeed, 0, moveDirection.normalized.z * runSpeed) * Time.deltaTime);
+            }
+            else
+            {
+                anim.SetFloat("RunSpeed", 1f);
+                charCtrl.Move(new Vector3(moveDirection.normalized.x * moveSpeed, 0, moveDirection.normalized.z * moveSpeed) * Time.deltaTime);
+            }
         }
 
         if (moveDirection != Vector3.zero && wallShoveTime <= moveOutOfShoveOffTime && curSwingBuffer <= 0)
@@ -577,8 +607,43 @@ public class PlayerController : MonoBehaviour
             storedDirection = moveDirection;
             if (curSwordSpinDuration <= 0.3f)
             {
-                model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount)), rotateSpeed / 3 * Time.deltaTime);
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed * Time.deltaTime);
+                if (isGrounded)
+                {
+                    Vector3 findDirection = transform.TransformDirection(moveDirection.z, 0, moveDirection.x);
+                    if (runAlternating)
+                    {
+                        if (runParticleEffect.isPlaying == false)
+                        {
+                            runParticleEffect.Play();
+                        }
+                        model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(new Vector3(findDirection.x * (moveModelLeanAmount * 1.5f), 0, findDirection.z * (-moveModelLeanAmount * 1.5f))), rotateSpeed * 1.5f * Time.deltaTime);
+                    }
+                    else if(isRunning)
+                    {
+                        if (runParticleEffect.isPlaying == false)
+                        {
+                            runParticleEffect.Play();
+                        }
+                        model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(new Vector3(findDirection.x * moveModelLeanAmount, 0, findDirection.z * -moveModelLeanAmount)), rotateSpeed * Time.deltaTime);
+                    }
+                    else
+                    {
+                        if (runParticleEffect.isPlaying == true)
+                        {
+                            runParticleEffect.Stop();
+                        }
+                        model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(new Vector3(findDirection.x * -moveModelLeanAmount, 0, findDirection.z * -moveModelLeanAmount)), rotateSpeed / 3 * Time.deltaTime);
+                    }
+                }
+                else
+                {
+                    if (runParticleEffect.isPlaying == true)
+                    {
+                        runParticleEffect.Stop();
+                    }
+                    model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.Euler(model.transform.TransformDirection(moveDirection.z * moveModelLeanAmount, 0, moveDirection.x * moveModelLeanAmount)), rotateSpeed / 3 * Time.deltaTime);
+                }
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), rotateSpeed / 2 * Time.deltaTime);
             }
         }
         else if(curSwingBuffer > 0)
@@ -611,6 +676,10 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            if (runParticleEffect.isPlaying == true)
+            {
+                runParticleEffect.Stop();
+            }
             model.transform.localRotation = Quaternion.Slerp(model.transform.localRotation, Quaternion.identity, rotateSpeed * Time.deltaTime);
             isMoving = false;
         }
@@ -666,17 +735,24 @@ public class PlayerController : MonoBehaviour
         {
             if (ballLogic.rb.velocity.y < -7)
             {
-                ballLogic.slopePowerTime += 1 * Time.deltaTime;
+                ballLogic.slopePowerTime += 1.2f * Time.deltaTime;
                 ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 10 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 10, moveDirection.normalized.z * rideMoveSpeed * 10 * Time.fixedDeltaTime), ballRideAcceleration * 6 * Time.deltaTime));
             }
             else if(ballLogic.slopePowered)
             {
                 ballLogic.slopePowerTime -= Time.deltaTime;
-                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 7 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 7, moveDirection.normalized.z * rideMoveSpeed * 7 * Time.fixedDeltaTime), ballRideAcceleration * 7 * Time.deltaTime));
+                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 8 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 8, moveDirection.normalized.z * rideMoveSpeed * 8 * Time.fixedDeltaTime), ballRideAcceleration * 7 * Time.deltaTime));
             }
             else
             {
-                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), ballRideAcceleration * Time.deltaTime));
+                if(Mathf.Abs(ballLogic.rb.velocity.x) < 3 && Mathf.Abs(ballLogic.rb.velocity.z) < 3)
+                {
+                    ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), 7 * Time.deltaTime));
+                }
+                else
+                {
+                    ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), ballRideAcceleration * Time.deltaTime));
+                }
             }
         }
         else
@@ -802,6 +878,49 @@ public class PlayerController : MonoBehaviour
         else
         {
             charCtrl.Move(Vector3.up * shoveHighJumpForce * shoveHighJumpTime * Time.deltaTime);
+        }
+    }
+
+    public void AlternateRun()
+    {
+        if (controls.Gameplay.LLegAction.WasReleasedThisFrame() && (alternateIndex == 0 || alternateIndex == 2))
+        {
+            alternateIndex = 1;
+            curAltWindowTime = maxAltWindowTime;
+        }
+        if (controls.Gameplay.RLegAction.WasReleasedThisFrame() && (alternateIndex == 0 || alternateIndex == 1))
+        {
+            alternateIndex = 2;
+            curAltWindowTime = maxAltWindowTime;
+        }
+
+        if (curAltWindowTime > 0)
+        {
+            if (controls.Gameplay.LLegAction.WasPressedThisFrame() && alternateIndex == 2)
+            {
+                alternateCount++;
+            }
+            else if (controls.Gameplay.RLegAction.WasPressedThisFrame() && alternateIndex == 1)
+            {
+                alternateCount++;
+            }
+            curAltWindowTime -= Time.deltaTime;
+        }
+        else
+        {
+            alternateCount = 0;
+        }
+
+        if (isGrounded)
+        {
+            if (alternateCount > 2)
+            {
+                runAlternating = true;
+            }
+            else
+            {
+                runAlternating = false;
+            }
         }
     }
 
@@ -978,6 +1097,11 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("SwordSpinDur", curSwordSpinDuration);
         anim.SetBool("HammerAirDrop", hammerAirDrop);
         anim.SetFloat("HammerSlamTime", curHammerSlamAnimTime);
+    }
+
+    public void ParticleOffset(int footID)
+    {
+        runParticleEffect.transform.localPosition = new Vector3(0.15f * footID, 0, 0);
     }
 
     private void OnDrawGizmosSelected()

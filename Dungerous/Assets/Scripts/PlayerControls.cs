@@ -107,6 +107,33 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""74f673b1-e671-4464-8471-e7e771ed197c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LLegAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""74713995-22bf-4d69-bb5a-c5711fabb319"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RLegAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""f133ab32-fcb7-4497-8fa9-d89e8eeebab0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -208,6 +235,50 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""FollowerCommandStandby"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4f650b5e-4ab7-447e-876f-ac2ef6e92cdd"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a9cb6290-1b17-45d1-9991-b4e790a4faa5"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4957638c-e708-4ce7-bba8-22f4064649d3"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""LLegAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fd2caf56-0df5-4910-83a6-42866580275e"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RLegAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -237,6 +308,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay_HoldUseItem = m_Gameplay.FindAction("HoldUseItem", throwIfNotFound: true);
         m_Gameplay_FollowerCommandReturn = m_Gameplay.FindAction("FollowerCommandReturn", throwIfNotFound: true);
         m_Gameplay_FollowerCommandStandby = m_Gameplay.FindAction("FollowerCommandStandby", throwIfNotFound: true);
+        m_Gameplay_Run = m_Gameplay.FindAction("Run", throwIfNotFound: true);
+        m_Gameplay_LLegAction = m_Gameplay.FindAction("LLegAction", throwIfNotFound: true);
+        m_Gameplay_RLegAction = m_Gameplay.FindAction("RLegAction", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -307,6 +381,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_HoldUseItem;
     private readonly InputAction m_Gameplay_FollowerCommandReturn;
     private readonly InputAction m_Gameplay_FollowerCommandStandby;
+    private readonly InputAction m_Gameplay_Run;
+    private readonly InputAction m_Gameplay_LLegAction;
+    private readonly InputAction m_Gameplay_RLegAction;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -320,6 +397,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @HoldUseItem => m_Wrapper.m_Gameplay_HoldUseItem;
         public InputAction @FollowerCommandReturn => m_Wrapper.m_Gameplay_FollowerCommandReturn;
         public InputAction @FollowerCommandStandby => m_Wrapper.m_Gameplay_FollowerCommandStandby;
+        public InputAction @Run => m_Wrapper.m_Gameplay_Run;
+        public InputAction @LLegAction => m_Wrapper.m_Gameplay_LLegAction;
+        public InputAction @RLegAction => m_Wrapper.m_Gameplay_RLegAction;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -356,6 +436,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @FollowerCommandStandby.started += instance.OnFollowerCommandStandby;
             @FollowerCommandStandby.performed += instance.OnFollowerCommandStandby;
             @FollowerCommandStandby.canceled += instance.OnFollowerCommandStandby;
+            @Run.started += instance.OnRun;
+            @Run.performed += instance.OnRun;
+            @Run.canceled += instance.OnRun;
+            @LLegAction.started += instance.OnLLegAction;
+            @LLegAction.performed += instance.OnLLegAction;
+            @LLegAction.canceled += instance.OnLLegAction;
+            @RLegAction.started += instance.OnRLegAction;
+            @RLegAction.performed += instance.OnRLegAction;
+            @RLegAction.canceled += instance.OnRLegAction;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -387,6 +476,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @FollowerCommandStandby.started -= instance.OnFollowerCommandStandby;
             @FollowerCommandStandby.performed -= instance.OnFollowerCommandStandby;
             @FollowerCommandStandby.canceled -= instance.OnFollowerCommandStandby;
+            @Run.started -= instance.OnRun;
+            @Run.performed -= instance.OnRun;
+            @Run.canceled -= instance.OnRun;
+            @LLegAction.started -= instance.OnLLegAction;
+            @LLegAction.performed -= instance.OnLLegAction;
+            @LLegAction.canceled -= instance.OnLLegAction;
+            @RLegAction.started -= instance.OnRLegAction;
+            @RLegAction.performed -= instance.OnRLegAction;
+            @RLegAction.canceled -= instance.OnRLegAction;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -424,5 +522,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnHoldUseItem(InputAction.CallbackContext context);
         void OnFollowerCommandReturn(InputAction.CallbackContext context);
         void OnFollowerCommandStandby(InputAction.CallbackContext context);
+        void OnRun(InputAction.CallbackContext context);
+        void OnLLegAction(InputAction.CallbackContext context);
+        void OnRLegAction(InputAction.CallbackContext context);
     }
 }

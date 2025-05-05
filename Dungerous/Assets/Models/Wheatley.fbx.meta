@@ -90,7 +90,23 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.33096087
+        functionName: ParticleOffset
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: -1
+        messageOptions: 0
+      - time: 0.74733096
+        functionName: ParticleOffset
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 8d5172bf9a7939a4392801d5c9a2396c,
+          type: 3}
+        floatParameter: 0
+        intParameter: 1
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
@@ -798,8 +814,8 @@ ModelImporter:
     useFileScale: 1
     strictVertexDataChecks: 0
   tangentSpace:
-    normalSmoothAngle: 90
-    normalImportMode: 0
+    normalSmoothAngle: 70
+    normalImportMode: 1
     tangentImportMode: 3
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0

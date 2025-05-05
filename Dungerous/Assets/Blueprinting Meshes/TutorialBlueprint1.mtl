@@ -1,0 +1,8 @@
+newmtl DirtTerrain
+Kd 0.735849 0.4621633 0.1631363
+d 0
+
+newmtl ClayTerrain
+Kd 0.4622641 0.3551293 0.3161712
+d 0
+
