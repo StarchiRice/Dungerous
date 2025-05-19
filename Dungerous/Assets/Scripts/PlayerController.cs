@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
     public float slopeLimit;
     public float currentSlope;
     public float slideFriction;
+    public float slideSpeed;
 
     public bool isRolling = false, isRiding = false, isRunning, runAlternating;
     public float maxAltWindowTime, curAltWindowTime;
@@ -185,9 +186,9 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         RaycastHit groundHit;
-        if (Physics.Raycast(groundCheck.position, -transform.up, out groundHit, groundCheckRadius, whatIsGround))
+        if (Physics.Raycast(groundCheck.position, -transform.up, out groundHit, groundCheckRadius * 1.5f, whatIsGround))
         {
-            Debug.DrawRay(groundCheck.position, -transform.up * groundCheckRadius, Color.red);
+            Debug.DrawRay(groundCheck.position, -transform.up * groundCheckRadius * 1.5f, Color.red);
             currentSlope = groundHit.normal.y * 90;
         }
         else
@@ -568,7 +569,7 @@ public class PlayerController : MonoBehaviour
         //Character sliding of surfaces
         if (!isGrounded)
         {
-            charCtrl.Move(new Vector3((1f - hitNormal.y) * hitNormal.x * (1f - slideFriction), 0, (1f - hitNormal.y) * hitNormal.z * (1f - slideFriction)) * Time.deltaTime);
+            charCtrl.Move(new Vector3((1f - hitNormal.y) * hitNormal.x * (1f - slideFriction), 0, (1f - hitNormal.y) * hitNormal.z * (1f - slideFriction)) * slideSpeed * Time.deltaTime);
         }
 
         ballLogic.isRide = false;
@@ -851,6 +852,7 @@ public class PlayerController : MonoBehaviour
                             shoveCol[i].GetComponent<EnemyHealth>().TakeDamage(0, 1, (shoveCol[i].transform.position - transform.position).normalized, attackOutputID, transform.position);
                         }
                         GameObject shoveEft = Instantiate(shoveEffect, shovePoint.position + (transform.forward * 0.25f), shovePoint.rotation, null);
+                        Destroy(shoveEft, 1f);
                     }
                 }
             }

@@ -25,6 +25,7 @@ public class CameraController : MonoBehaviour
     public LayerMask whatIsObstruct;
     public bool isObstructed;
     public bool isCamObstructed;
+    public Vector3 obstructTarget;
 
     //References
     private PlayerController player;
@@ -69,9 +70,12 @@ public class CameraController : MonoBehaviour
             else if (isObstructed == false)
             {
                 obstructCheck.localPosition = ballFocusOffset;
-                transform.localPosition = Vector3.MoveTowards(transform.localPosition, ballFocusOffset, followSpeed * Time.deltaTime);
+                if (!isCamObstructed)
+                {
+                    transform.localPosition = Vector3.MoveTowards(transform.localPosition, ballFocusOffset, followSpeed * Time.deltaTime);
+                }
             }
-            else if(isCamObstructed)
+            else
             {
                 transform.localPosition = Vector3.MoveTowards(transform.localPosition, Vector3.zero, followSpeed * 3 * Time.deltaTime);
             }
@@ -85,11 +89,14 @@ public class CameraController : MonoBehaviour
             pivot.transform.position = Vector3.Slerp(pivot.transform.position, player.transform.position, followSpeed * Time.deltaTime);
             if (isObstructed == false)
             {
-                transform.localPosition = Vector3.MoveTowards(transform.localPosition, playerFocusOffset, followSpeed * Time.deltaTime);
+                if (!isCamObstructed)
+                {
+                    transform.localPosition = Vector3.MoveTowards(transform.localPosition, playerFocusOffset, followSpeed * Time.deltaTime);
+                }
             }
-            else if(isCamObstructed)
+            else
             {
-                transform.localPosition = Vector3.MoveTowards(transform.localPosition, Vector3.zero, followSpeed * 3 * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, obstructTarget, followSpeed * 4 * Time.deltaTime);
             }
             transform.localEulerAngles = startEuler;
         }
@@ -107,24 +114,26 @@ public class CameraController : MonoBehaviour
             obstructTargetOffset = Vector3.up * 2;
         }
 
-        Vector3 obstructTarget = target.transform.position + obstructTargetOffset;
+        obstructTarget = target.transform.position + obstructTargetOffset;
 
-        if (Physics.Raycast(transform.position, obstructTarget - transform.position, Vector3.Distance(transform.position, obstructTarget), whatIsObstruct))
+        if (Physics.Raycast(obstructTarget, transform.position - obstructTarget, Vector3.Distance(transform.position + (transform.forward * -1), obstructTarget), whatIsObstruct))
         {
-            isCamObstructed = true;
-        }
-        else
-        {
-            isCamObstructed = false;
-        }
-
-        if (Physics.Raycast(obstructCheck.position, obstructTarget - obstructCheck.position, Vector3.Distance(obstructCheck.position, obstructTarget), whatIsObstruct))
-        {
+            //Debug.DrawRay(obstructTarget, transform.position - obstructTarget, Color.yellow, Vector3.Distance(transform.position, obstructTarget));
             isObstructed = true;
         }
         else
         {
             isObstructed = false;
+        }
+
+        if (Physics.Raycast(transform.position, obstructCheck.position - transform.position, Vector3.Distance(obstructCheck.position, transform.position + (transform.forward * -1)), whatIsObstruct))
+        {
+            //Debug.DrawRay(transform.position, obstructCheck.position - transform.position, Color.magenta, Vector3.Distance(transform.position, obstructCheck.position));
+            isCamObstructed = true;
+        }
+        else
+        {
+            isCamObstructed = false;
         }
     }
 

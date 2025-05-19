@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1663896707345343195
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TerrainFresnlMat
+  m_Shader: {fileID: -6465566751694194690, guid: 240cd0cb753c2644bb1978f93a39f2b9,
+    type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Normal_Tex:
+        m_Texture: {fileID: 2800000, guid: cd3acd2d70193144394a21828a151dbf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture:
+        m_Texture: {fileID: 2800000, guid: abeb2aa58282df44fab7180909d5f474, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Brightness: 1.4
+    - _Center_Fade: 0.79
+    - _Center_Noise: 1
+    - _Center_Power: 0.04
+    - _Center_Step: 0.97
+    - _Fade: 0.77
+    - _Fade_2: 0.86
+    - _Fade_Contrast: 15.95
+    - _Fresnel_Edge_Fade: 0.55
+    - _Fresnel_Edge_Power: 0.5
+    - _Fresnel_Edge_Step_Power: 0.68
+    - _Fresnel_Power: 1.22
+    - _Fresnel_Power_2: 0.8
+    - _Grunge_Density: 12
+    - _Grunge_Opacity: 0.15
+    - _HasInflections: 1
+    - _Has_Grunge: 1
+    - _Inflection_Angle: 25.02
+    - _Inflection_Contrast: 2
+    - _Inflection_Density: 0
+    - _Inflection_Opacity: 0.18
+    - _Inflection_Wall_Angle: 15.3
+    - _Inflection_Wall_Density: 60
+    - _N: 5
+    - _Noise: 2.55
+    - _Normal_Contrast: 0.03
+    - _Normal_Strength: 1
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _Rock_Density: 500
+    - _Rock_Shading_Density: 800
+    - _Rock_Shading_Height: 0.5
+    - _Rock_Shading_Ruggedness: 6
+    - _Rock_Shading_Width: 0.5
+    - _Scale_Power: -0.02
+    - _Smooth_Step_1: 0.51
+    - _Smooth_Step_2: 0.7
+    - _Smoothness: 0
+    - _Step_Power: 0.4
+    - _Step_Power_2: 0.36
+    - _Texture_Contrast: 1.1
+    - _Underside_Fade: 0.79
+    - _Underside_Fade_Changed: 0.3
+    - _Underside_Fresnel_Power: 5
+    - _Underside_Normal: -0.14
+    - _Underside_Shade_Change: -0.21
+    - _Underside_Shading: 1
+    - _Underside_Step: 0.98
+    - _Vertical_Fade: 0.72
+    - _Vertical_Fade_Strength: 1
+    - _Wall_Inflection_Definition: 13
+    - _Wall_Normal_Max: 0.3
+    - _Wall_Normal_Min: 0.3
+    m_Colors:
+    - _Grunge_Tiling: {r: 30, g: 30, b: 0, a: 0}
+    - _Inflection_Tiling: {r: 50, g: 50, b: 0, a: 0}
+    - _Normal_Tiling: {r: 8, g: 8, b: 0, a: 0}
+    - _Wall_Inflection_Tiling: {r: 100, g: 100, b: 0, a: 0}
+    - _Wall_Normal_Max: {r: 0.3, g: 0.3, b: 0.3, a: 0}
+    - _Wall_Normal_Min: {r: -0.3, g: -0.3, b: -0.3, a: 0}
+  m_BuildTextureStacks: []
