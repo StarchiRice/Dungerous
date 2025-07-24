@@ -21,15 +21,19 @@ public class BallController : MonoBehaviour
     public float groundCheckRadius;
     public LayerMask whatIsGround;
 
-    public Vector3 freeRolVel;
+    public Vector3 freeRolVel, lastChargDir;
 
     public bool slopePowered;
     public float slopePowerTime;
+
+    public float chargeRollForce;
 
     //References
     public GameObject ballModel;
     private CharacterController ctrl;
     public Rigidbody rb;
+
+    public GameObject chargeRollEffect;
 
     // Start is called before the first frame update
     void Start()
@@ -55,7 +59,7 @@ public class BallController : MonoBehaviour
             ctrl.transform.rotation = Quaternion.LookRotation(new Vector3(ctrl.velocity.x, 0, ctrl.velocity.z));
         }
 
-        ballModel.transform.position = Vector3.MoveTowards(ballModel.transform.position, new Vector3(transform.position.x, transform.position.y + 2.4f, transform.position.z), 50 * Time.deltaTime);
+        ballModel.transform.position = Vector3.MoveTowards(ballModel.transform.position, new Vector3(transform.position.x, transform.position.y + 2.5f, transform.position.z), 50 * Time.deltaTime);
 
         if(Physics.CheckSphere(ballRideCheck.position, rideCheckRadius, whatCanRide))
         {
@@ -109,6 +113,20 @@ public class BallController : MonoBehaviour
     {
         freeRoll = true;
         isRide = true;
+    }
+
+    public void ChargeRoll(Vector3 chargDir)
+    {
+        Instantiate(chargeRollEffect, transform.position + (Vector3.up * 2.5f), Quaternion.LookRotation(chargDir, Vector3.up), transform);
+        if (chargDir != Vector3.zero)
+        {
+            rb.velocity += chargDir.normalized * chargeRollForce;
+            lastChargDir = chargDir.normalized;
+        }
+        else
+        {
+            rb.velocity += lastChargDir * chargeRollForce;
+        }
     }
 
     private void OnDrawGizmosSelected()

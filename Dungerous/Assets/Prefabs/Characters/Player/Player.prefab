@@ -295,7 +295,7 @@ MonoBehaviour:
   rollMoveSpeed: 4
   rotateSpeed: 20
   jumpForce: 60
-  ballRollDistance: 0.2
+  ballRollDistance: 0.25
   maxDistancetToBall: 3.5
   maxJumpTime: 0.35
   wallShoveForce: 35
@@ -323,7 +323,7 @@ MonoBehaviour:
   slopeLimit: 50
   currentSlope: 0
   slideFriction: 0
-  slideSpeed: 8
+  slideSpeed: 5
   isRolling: 0
   isRiding: 0
   isRunning: 0
@@ -338,10 +338,11 @@ MonoBehaviour:
   moveDirectionR: {x: 0, y: 0, z: 0}
   storedDirection: {x: 0, y: 0, z: 0}
   moveModelLeanAmount: 15
-  rideMoveSpeed: 900
+  rideMoveSpeed: 1200
   ballRideAcceleration: 6.5
-  rideModeFollowSpeed: 20
+  rideModeFollowSpeed: 50
   checkingInventory: 0
+  chargeBoostTime: 2
   startShoveCooldownTime: 1
   shovePoint: {fileID: 429273313216517695}
   shoveRadius: 0.5

@@ -776,6 +776,64 @@ ModelImporter:
       maskType: 3
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: MoveFast.Rideball
+      takeName: MoveFast.Rideball.002
+      internalID: 3789134046536986828
+      firstFrame: 0
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: RollBoost.Rideball
+      takeName: RollBoost.Rideball
+      internalID: -5736839515877641097
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 0
   meshes:
     lODScreenPercentages: []
@@ -834,17 +892,17 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: Wheatley
       parentName: Wheatley(Clone)
-      position: {x: -0, y: 0.32414818, z: -0.40865394}
+      position: {x: -0, y: 0.32414818, z: -0.40865397}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 62.18297, y: 62.18297, z: 62.18297}
     - name: Armature
       parentName: Wheatley(Clone)
-      position: {x: -0, y: 0.06773961, z: 0.20252848}
+      position: {x: -0, y: 0.067739606, z: 0.20252846}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 100, y: 100, z: 100}
     - name: MainLower
       parentName: Armature
-      position: {x: -0, y: 0.00093420566, z: -0.0011850197}
+      position: {x: -0, y: 0.0009342056, z: -0.0011850197}
       rotation: {x: 0.50000006, y: -0.49999997, z: 0.49999997, w: -0.5000001}
       scale: {x: 0.99999994, y: 0.9999999, z: 0.99999994}
     - name: Waist
@@ -854,32 +912,32 @@ ModelImporter:
       scale: {x: 1.0000075, y: 1.0000001, z: 1.0000001}
     - name: Abdomen
       parentName: Waist
-      position: {x: 2.9198867e-17, y: 0.0019540072, z: 1.192093e-10}
+      position: {x: 2.9198867e-17, y: 0.001954007, z: 1.192093e-10}
       rotation: {x: -0.13535427, y: -0.0000000114087015, z: 0.000000009313226, w: 0.9907973}
       scale: {x: 1, y: 0.9999999, z: 1}
     - name: Torso
       parentName: Abdomen
-      position: {x: -2.2204462e-18, y: 0.0016705293, z: 3.7252906e-11}
+      position: {x: -2.2204462e-18, y: 0.0016705291, z: 3.7252906e-11}
       rotation: {x: -0.2075303, y: 0.000000018221757, z: 0.000000100960804, w: 0.97822857}
       scale: {x: 1, y: 1.0000002, z: 1}
     - name: ShoulderUpper.L
       parentName: Torso
-      position: {x: 0.0030460733, y: 0.0017265182, z: -0.00078102207}
+      position: {x: 0.003046073, y: 0.0017265182, z: -0.000781022}
       rotation: {x: 0.15826796, y: 0.21070246, z: -0.6959769, w: 0.667961}
       scale: {x: 1.0000008, y: 0.9999992, z: 0.9999999}
     - name: BicepUpper.L
       parentName: ShoulderUpper.L
-      position: {x: 1.0171675e-10, y: 0.001979413, z: 2.3283064e-10}
+      position: {x: 1.01716746e-10, y: 0.001979413, z: 2.3283064e-10}
       rotation: {x: 0.054080695, y: 0.0006756782, z: 0.028839642, w: 0.9981198}
       scale: {x: 1.0000025, y: 0.99999815, z: 1.0000007}
     - name: ForearmUpper.L
       parentName: BicepUpper.L
-      position: {x: 6.705523e-10, y: 0.0016398812, z: -1.7881394e-10}
+      position: {x: 6.705523e-10, y: 0.0016398813, z: -1.7881394e-10}
       rotation: {x: -0.038124513, y: -0.0000000494765, z: -0.000067311674, w: 0.99927306}
       scale: {x: 0.9999995, y: 0.9999983, z: 1.0000017}
     - name: HandUpper.L
       parentName: ForearmUpper.L
-      position: {x: -0, y: 0.0016778394, z: -5.960465e-10}
+      position: {x: -0, y: 0.0016778393, z: -5.960465e-10}
       rotation: {x: 0.014681885, y: 0.00040646555, z: -0.027742265, w: 0.99950725}
       scale: {x: 1.0000004, y: 0.9999998, z: 1.0000004}
     - name: HandUpper.L_end
@@ -889,12 +947,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: ShoulderLower.L
       parentName: Torso
-      position: {x: 0.0033014282, y: -0.000690313, z: -0.002205511}
+      position: {x: 0.003301428, y: -0.000690313, z: -0.002205511}
       rotation: {x: 0.1582683, y: 0.21070248, z: -0.6959768, w: 0.6679612}
       scale: {x: 0.99999976, y: 0.99999666, z: 1.0000035}
     - name: BicepLower.L
       parentName: ShoulderLower.L
-      position: {x: 4.4703484e-11, y: 0.0015457034, z: 1.05239456e-10}
+      position: {x: 4.4703484e-11, y: 0.0015457034, z: 1.0523946e-10}
       rotation: {x: 0.054080572, y: 0.00067535025, z: 0.028839497, w: 0.9981199}
       scale: {x: 1.0000002, y: 0.9999995, z: 1.0000007}
     - name: ForearmLower.L
@@ -914,7 +972,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: ShoulderUpper.R
       parentName: Torso
-      position: {x: -0.0030460737, y: 0.0017265115, z: -0.0007810261}
+      position: {x: -0.0030460737, y: 0.0017265116, z: -0.000781026}
       rotation: {x: 0.15826751, y: -0.21070302, z: 0.6959785, w: 0.6679593}
       scale: {x: 1.000001, y: 0.9999998, z: 0.9999999}
     - name: BicepUpper.R
@@ -924,12 +982,12 @@ ModelImporter:
       scale: {x: 1.0000023, y: 0.99999815, z: 1.0000007}
     - name: ForearmUpper.R
       parentName: BicepUpper.R
-      position: {x: -3.129244e-10, y: 0.0016398822, z: -1.192093e-10}
+      position: {x: -3.1292438e-10, y: 0.0016398822, z: -1.192093e-10}
       rotation: {x: -0.038124584, y: 0.000000068917856, z: 0.000067385634, w: 0.999273}
       scale: {x: 0.99999976, y: 0.9999981, z: 1.0000018}
     - name: HandUpper.R
       parentName: ForearmUpper.R
-      position: {x: -1.192093e-10, y: 0.0016778405, z: 2.384186e-10}
+      position: {x: -1.192093e-10, y: 0.0016778406, z: 2.384186e-10}
       rotation: {x: 0.014681974, y: -0.00040651325, z: 0.02774224, w: 0.99950725}
       scale: {x: 1.0000001, y: 0.99999994, z: 1.0000006}
     - name: HandUpper.R_end
@@ -939,22 +997,22 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: ShoulderLower.R
       parentName: Torso
-      position: {x: -0.003301429, y: -0.0006903204, z: -0.0022055157}
+      position: {x: -0.0033014286, y: -0.0006903204, z: -0.0022055157}
       rotation: {x: 0.15826757, y: -0.2107032, z: 0.6959786, w: 0.6679591}
       scale: {x: 1, y: 0.9999966, z: 1.0000036}
     - name: BicepLower.R
       parentName: ShoulderLower.R
-      position: {x: 1.937151e-10, y: 0.0015457036, z: -6.146729e-11}
+      position: {x: 1.937151e-10, y: 0.0015457037, z: -6.146729e-11}
       rotation: {x: 0.054080747, y: -0.00067541, z: -0.028839724, w: 0.9981198}
       scale: {x: 1.0000006, y: 0.99999994, z: 1.0000011}
     - name: ForearmLower.R
       parentName: BicepLower.R
-      position: {x: -1.1175871e-10, y: 0.0012805668, z: -5.7369476e-10}
+      position: {x: -1.1175871e-10, y: 0.0012805667, z: -5.7369476e-10}
       rotation: {x: -0.038124613, y: -0.0000003681052, z: 0.00006742961, w: 0.999273}
       scale: {x: 1.0000008, y: 1.0000004, z: 0.9999988}
     - name: HandLower.R
       parentName: ForearmLower.R
-      position: {x: -2.384186e-10, y: 0.0013102073, z: -2.384186e-10}
+      position: {x: -2.384186e-10, y: 0.0013102072, z: -2.384186e-10}
       rotation: {x: 0.014681902, y: -0.0004066003, z: 0.02774235, w: 0.99950725}
       scale: {x: 1.0000004, y: 1.0000001, z: 1.0000004}
     - name: HandLower.R_end
@@ -969,12 +1027,12 @@ ModelImporter:
       scale: {x: 1, y: 0.99999994, z: 0.99999976}
     - name: Head_end
       parentName: Head
-      position: {x: -0, y: 0.0034538247, z: 0}
+      position: {x: -0, y: 0.0034538242, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Thigh.L
       parentName: Waist
-      position: {x: 0.002264494, y: 0.001080926, z: -0.00025621816}
+      position: {x: 0.0022644938, y: 0.001080926, z: -0.00025621816}
       rotation: {x: 0.009299456, y: 0.09045196, z: 0.99163234, w: -0.09163701}
       scale: {x: 0.999999, y: 1.0000006, z: 1.000003}
     - name: Quad.L
@@ -989,12 +1047,12 @@ ModelImporter:
       scale: {x: 1.0000002, y: 1.0000005, z: 1}
     - name: Heel.L
       parentName: Calf.L
-      position: {x: -2.384186e-10, y: 0.0012253394, z: 1.192093e-10}
+      position: {x: -2.384186e-10, y: 0.0012253392, z: 1.192093e-10}
       rotation: {x: 0.39459577, y: 0.0000000063336802, z: -0.00037087695, w: 0.91885483}
       scale: {x: 1.0000005, y: 1.0000002, z: 1.0000001}
     - name: Foot.L
       parentName: Heel.L
-      position: {x: -2.9802324e-11, y: 0.00075990334, z: 0}
+      position: {x: -2.9802324e-11, y: 0.0007599033, z: 0}
       rotation: {x: 0.9407892, y: -0.000000031555814, z: -0.00088414183, w: -0.33899093}
       scale: {x: 1.0000001, y: 1.0000001, z: 1.0000007}
     - name: Foot.L_end
@@ -1004,7 +1062,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: Thigh.R
       parentName: Waist
-      position: {x: -0.002264494, y: 0.0010809195, z: -0.00025621682}
+      position: {x: -0.0022644938, y: 0.0010809194, z: -0.00025621682}
       rotation: {x: -0.009297907, y: 0.09045176, z: 0.99163234, w: 0.09163731}
       scale: {x: 0.9999991, y: 1.0000002, z: 0.9999995}
     - name: Quad.R
@@ -1014,7 +1072,7 @@ ModelImporter:
       scale: {x: 1.0000001, y: 1.0000007, z: 0.99999994}
     - name: Calf.R
       parentName: Quad.R
-      position: {x: -1.8626452e-10, y: 0.0012313785, z: -1.7881394e-10}
+      position: {x: -1.8626452e-10, y: 0.0012313784, z: -1.7881394e-10}
       rotation: {x: 0.052159935, y: -0.000000046682537, z: 0.000049011152, w: 0.9986388}
       scale: {x: 1.0000002, y: 1.0000002, z: 1.0000002}
     - name: Heel.R
@@ -1024,7 +1082,7 @@ ModelImporter:
       scale: {x: 1.0000001, y: 1.000001, z: 0.9999995}
     - name: Foot.R
       parentName: Heel.R
-      position: {x: 1.4901162e-10, y: 0.0007599037, z: -2.0861626e-10}
+      position: {x: 1.4901162e-10, y: 0.00075990363, z: -2.0861626e-10}
       rotation: {x: -0.9407892, y: 0.000000031265916, z: -0.0008841018, w: 0.338991}
       scale: {x: 0.9999993, y: 1.0000001, z: 0.9999982}
     - name: Foot.R_end

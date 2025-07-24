@@ -64,12 +64,20 @@ public class PlayerController : MonoBehaviour
 
     public float moveModelLeanAmount;
 
+    //Ball Ride Vars
     public float rideMoveSpeed;
     public float ballRideAcceleration;
     public float rideModeFollowSpeed;
 
+    public float ballSpeed;
+
     public bool checkingInventory;
 
+    public float chargeBoostTime;
+    private float curChargeBoostTime;
+    private bool canChargeBoost;
+
+    //Shove Vars
     private float shoveCooldownTime;
     public float startShoveCooldownTime;
     public Transform shovePoint;
@@ -78,7 +86,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask whatCanShoveOff;
     public float moveOutOfShoveOffTime;
 
-    ///Sword Vars
+    //Sword Vars
     public float swordHitBoxRadius;
     public Transform swordHitBoxPoint;
     public LayerMask whatCanSwordHit;
@@ -441,6 +449,17 @@ public class PlayerController : MonoBehaviour
             RideBall();
         }
 
+        //Tick down charge boost
+        if(curChargeBoostTime > 0)
+        {
+            canChargeBoost = false;
+            curChargeBoostTime -= Time.deltaTime;
+        }
+        else
+        {
+            canChargeBoost = true;
+        }
+
         //Tick down swing buffer
         if(curSwingBuffer > 0)
         {
@@ -723,9 +742,9 @@ public class PlayerController : MonoBehaviour
         model.transform.localEulerAngles = Vector3.zero;
 
         RaycastHit ballDistHit;
-        if (Physics.Raycast(transform.position + (Vector3.up * charCtrl.height * 1.25f), (ballTrans.position - transform.position + (Vector3.up * charCtrl.height * 1.25f)).normalized, out ballDistHit, Vector3.Distance(transform.position + (Vector3.up * charCtrl.height * 1.25f), ballTrans.position), whatIsBall))
+        if (Physics.Raycast(transform.position + (Vector3.up * charCtrl.height * 1.25f), ((ballTrans.position - (Vector3.up * 2.5f)) - transform.position + (Vector3.up * charCtrl.height * 1.25f)).normalized, out ballDistHit, Vector3.Distance(transform.position + (Vector3.up * charCtrl.height * 1.25f), ballTrans.position), whatIsBall))
         {
-            Debug.DrawRay(transform.position + (Vector3.up * charCtrl.height * 1.25f), (ballTrans.position - transform.position + (Vector3.up * charCtrl.height * 1.25f)).normalized * Vector3.Distance(transform.position + (Vector3.up * charCtrl.height * 1.25f), ballDistHit.point), Color.cyan);
+            Debug.DrawRay(transform.position + (Vector3.up * charCtrl.height * 1.25f), ((ballTrans.position -(Vector3.up * 2.5f)) - transform.position + (Vector3.up * charCtrl.height * 1.25f)).normalized * Vector3.Distance(transform.position + (Vector3.up * charCtrl.height * 1.25f), ballDistHit.point), Color.cyan);
         }
 
         Vector3 correctedDistanceMaintainVector = ballDistHit.point + ((ballDistHit.point - ballTrans.position).normalized * ballRollDistance);
@@ -749,46 +768,34 @@ public class PlayerController : MonoBehaviour
 
     void RideBall()
     {
+        AlternateRun();
         if (runParticleEffect.isPlaying == true || altRunParticleEffect.isPlaying == true)
         {
             runParticleEffect.Stop();
             altRunParticleEffect.Stop();
         }
         moveDirection = cam.pivot.transform.TransformDirection(new Vector3(moveLInput.x, 0, moveLInput.y));
-        
+        ballSpeed = ballLogic.rb.velocity.magnitude;
+
+
         ballLogic.BallRide();
         transform.position = Vector3.Lerp(transform.position, ballLogic.ballRidePoint.position, rideModeFollowSpeed * Time.deltaTime);
 
         if (ballLogic.isGrounded)
         {
-            if (ballLogic.rb.velocity.y < -7)
+            if(curChargeBoostTime <= 0)
             {
-                ballLogic.slopePowerTime += 1.2f * Time.deltaTime;
-                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 10 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 10, moveDirection.normalized.z * rideMoveSpeed * 10 * Time.fixedDeltaTime), ballRideAcceleration * 6 * Time.deltaTime));
-            }
-            else if(ballLogic.slopePowered)
-            {
-                ballLogic.slopePowerTime -= Time.deltaTime;
-                ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * 8 * Time.fixedDeltaTime, ballLogic.rb.velocity.y * 8, moveDirection.normalized.z * rideMoveSpeed * 8 * Time.fixedDeltaTime), ballRideAcceleration * 7 * Time.deltaTime));
-            }
-            else
-            {
-                if(Mathf.Abs(ballLogic.rb.velocity.x) < 3 && Mathf.Abs(ballLogic.rb.velocity.z) < 3)
+                if(runAlternating)
                 {
-                    ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), 7 * Time.deltaTime));
-                }
-                else
-                {
-                    ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), ballRideAcceleration * Time.deltaTime));
+                    ballLogic.ChargeRoll(moveDirection);
+                    curChargeBoostTime = chargeBoostTime;
                 }
             }
+            ballLogic.rb.velocity = (Vector3.MoveTowards(ballLogic.rb.velocity, new Vector3(moveDirection.normalized.x * rideMoveSpeed * Time.fixedDeltaTime, ballLogic.rb.velocity.y, moveDirection.normalized.z * rideMoveSpeed * Time.fixedDeltaTime), ballRideAcceleration * Time.deltaTime));
         }
         else
         {
-            if(ballLogic.slopePowered)
-            {
-                ballLogic.slopePowerTime -= Time.deltaTime;
-            }
+            ballLogic.slopePowerTime -= Time.deltaTime;
         }
         if (moveDirection != Vector3.zero)
         {
@@ -1120,6 +1127,10 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("IsMovingBall", isMovingBall);
         anim.SetBool("IsRiding", isRiding);
         anim.SetFloat("RideSpeed", Mathf.Clamp( new Vector3(ballLogic.rb.velocity.x, 0, ballLogic.rb.velocity.z).magnitude * 0.5f, 0.1f, rideMoveSpeed));
+        anim.SetFloat("BallSpeed", ballSpeed);
+        anim.SetInteger("AlternateCount", alternateCount);
+        anim.SetBool("IsAlternating", runAlternating);
+        anim.SetBool("CanChargeBoost", canChargeBoost);
         anim.SetInteger("CurItem", equipCtrl.curItemID);
         anim.SetBool("HighJumpReady", highJumpReady);
         anim.SetInteger("AttackStage", attackStage);

@@ -185,7 +185,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4239969958571976334}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 2.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -223,14 +223,14 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8685788256234400999}
   - {fileID: 1184317519250025472}
   - {fileID: 6219071132362584871}
   - {fileID: 695493484812551508}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2905039844344954812
 MonoBehaviour:
@@ -256,15 +256,19 @@ MonoBehaviour:
     m_Bits: 512
   isGrounded: 0
   groundCheck: {fileID: 695493484812551508}
-  groundCheckRadius: 2.35
+  groundCheckRadius: 2.4
   whatIsGround:
     serializedVersion: 2
     m_Bits: 65600
   freeRolVel: {x: 0, y: 0, z: 0}
+  lastChargDir: {x: 0, y: 0, z: 0}
   slopePowered: 0
   slopePowerTime: 0
+  chargeRollForce: 10
   ballModel: {fileID: 8157658402580222543}
   rb: {fileID: 0}
+  chargeRollEffect: {fileID: 1191004769956819625, guid: 475eac5a182dcb34c836b19f077da601,
+    type: 3}
 --- !u!114 &2744704539994979221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -505,7 +509,7 @@ Transform:
   m_GameObject: {fileID: 8157658402580222543}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 2.5, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 12.5, y: 12.5, z: 12.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7016288221194625998}
@@ -532,7 +536,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.48
+  m_Radius: 0.192
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8848211389579378185
 GameObject:
